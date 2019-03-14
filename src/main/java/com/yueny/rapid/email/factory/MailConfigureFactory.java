@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * DefaultMonitorFactory
+ * MailConfigureFactory
  */
-public class MailMonitorFactory {
-    private static MailMonitorFactory _instants = new MailMonitorFactory();
+public class MailConfigureFactory {
+    private static MailConfigureFactory _instants = new MailConfigureFactory();
 
     /**
      * 配置注册
@@ -68,13 +68,16 @@ public class MailMonitorFactory {
     private ConcurrentMap<String, EmailConfigureData> emailConfigureDataConcurrentMap =
             new MapMaker().weakValues().makeMap();
 
-    public MailMonitorFactory() {
+    public MailConfigureFactory() {
         //.
     }
 
     private boolean _register(EmailConfigureData config) {
         if(config == null || !emailConfigureDataConcurrentMap.containsKey(config.getUserName())){
             emailConfigureDataConcurrentMap.putIfAbsent(config.getUserName(), config);
+
+            //创建session
+            MailJavaxSessionFactory.create(config);
             return true;
         }
 
@@ -89,6 +92,8 @@ public class MailMonitorFactory {
         if(_exist(userName)){
             emailConfigureDataConcurrentMap.get(userName).setHostName(hostName);
             emailConfigureDataConcurrentMap.get(userName).setPassword(password);
+
+            MailJavaxSessionFactory.refresh(userName, password, hostName);
             return true;
         }
 
