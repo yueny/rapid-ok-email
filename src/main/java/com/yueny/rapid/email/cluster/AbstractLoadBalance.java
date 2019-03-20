@@ -25,6 +25,7 @@ public abstract class AbstractLoadBalance implements LoadEmailBalance {
 
     @Override
     public EmailConfigureData select(List<EmailConfigureData> invokers) {
+        // 如果未配置, 则返回空
         if (CollectionUtils.isEmpty(invokers)) {
             return null;
         }

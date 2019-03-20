@@ -3,6 +3,7 @@
  */
 package com.yueny.rapid.email.sender.internals.tacitly;
 
+import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
 import com.yueny.rapid.email.sender.entity.MessageData;
 import com.yueny.rapid.email.sender.entity.ThreadEmailEntry;
@@ -47,6 +48,6 @@ public interface IEmailServer {
 	 * @throws Exception
 	 *             Email异常
 	 */
-	String sendSyn(final MessageData emailMessage) throws Exception;
+	String sendSyn(final MessageData emailMessage) throws SendMailException;
 
 }

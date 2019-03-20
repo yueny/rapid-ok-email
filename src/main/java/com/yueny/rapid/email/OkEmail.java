@@ -1,28 +1,25 @@
 package com.yueny.rapid.email;
 
-import com.yueny.rapid.email.cluster.RandomLoadBalance;
 import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailConstant;
 import com.yueny.rapid.email.encrypt.EncryptedEmailPasswordCallback;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.factory.MailConfigureFactory;
 import com.yueny.rapid.email.model.xml.XMLEmailConfiguration;
+import com.yueny.rapid.email.sender.entity.FileMsgAttachmentEntry;
 import com.yueny.rapid.email.sender.entity.MessageData;
+import com.yueny.rapid.email.sender.entity.URLMsgAttachmentEntry;
 import com.yueny.rapid.email.sender.internals.tacitly.IEmailServer;
 import com.yueny.rapid.email.util.MailSmtpType;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.internet.*;
 import javax.xml.bind.JAXB;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -31,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OkEmail implements IOkEmail {
     private static String xmlPath = "/email/email-config.xml";
 
-    static{
+    static {
         EmailConfigureData ec = init();
         if(ec != null) {
             MailConfigureFactory.register(ec);
@@ -56,13 +53,13 @@ public class OkEmail implements IOkEmail {
 
             ec.setUserName(emailDefaultConfiguration.getAuth().getUserName());
             ec.setDecrypt(emailDefaultConfiguration.getAuth().getDecrypt());
-
-            ec.setPassword(emailDefaultConfiguration.getAuth().getPassword());
             if (ec.isDecrypt()) {
                 final String dePasswd = emailDefaultConfiguration.getAuth().getPassword();
                 // 密码解密
                 final String pas = EncryptedEmailPasswordCallback.decrypt(dePasswd);
                 ec.setPassword(pas);
+            }else{
+                ec.setPassword(emailDefaultConfiguration.getAuth().getPassword());
             }
 
             ec.setSmtpPort(emailDefaultConfiguration.getSmtpPort());
@@ -93,7 +90,7 @@ public class OkEmail implements IOkEmail {
      *
      *
      * @param username email auth username
-     * @param password email auth password
+     * @param password email auth password 明文密码. 默认密码不加密
      */
     public static void config(MailSmtpType mailType, final String username, final String password) {
         config(mailType, username, password, false);
@@ -102,48 +99,92 @@ public class OkEmail implements IOkEmail {
      * 即使存在, 也进行邮箱初始化配置.
      * only config username and password.
      *
-     *
-     * // 初始化
-     * refreshEven(OkEmail.SMTP_126(false), "deep_blue_yang@126.com", "li....");
-     *
+     * config(MailSmtpType._126, "deep_blue_yang@126.com", "sdfasfdsfgsfas", true);
      *
      * @param username email auth username
-     * @param password email auth password
+     * @param password email auth password 密码
+     * @param isEncrypt 是否已加密
      */
-    public static void config(MailSmtpType mailType, final String username, final String password, boolean debug) {
+    public static void config(MailSmtpType mailType, final String username, final String password, boolean isEncrypt) {
+        config(mailType, username, password, isEncrypt, false);
+    }
+    /**
+     * 即使存在, 也进行邮箱初始化配置.
+     * only config username and password.
+     *
+     * config(MailSmtpType._126, "deep_blue_yang@126.com", "sdfasfdsfgsfas", true, false);
+     *
+     * @param username email auth username
+     * @param password email auth password 密码
+     * @param isEncrypt 是否已加密
+     * @param debug 是否debug模式
+     */
+    public static void config(MailSmtpType mailType, final String username, final String password, boolean isEncrypt, boolean debug) {
+        String pw = password;
+        if(isEncrypt){
+            pw = EncryptedEmailPasswordCallback.decrypt(password);
+        }
+
         if(MailConfigureFactory.exist(username)){
-            MailConfigureFactory.refresh(username, password, mailType.getHostName());
+            MailConfigureFactory.refresh(username, pw, mailType.getHostName());
         }else{
             EmailConfigureData ec = defaultConfig(debug);
             ec.setHostName(mailType.getHostName());
             ec.setUserName(username);
-            ec.setPassword(password);
+            ec.setPassword(pw);
 
             MailConfigureFactory.register(ec);
         }
     }
 
+
+    //		/* 认证信息设置，取自配置 */
+//		// 设置SMTP服务器名称
+//		mailSender.setHost(getEmailConfigure().getHostName());
+//		// 设置SMTP端口
+//		mailSender.setPort(Integer.valueOf(getEmailConfigure().getSmtpPort()));
+//
+//		// Default is "smtp".
+//		// mailSender.setProtocol(protocol);
+//
+//		// 设置认证信息
+//		mailSender.setUsername(getEmailConfigure().getUserName());
+//        mailSender.setPassword(getEmailConfigure().getPassword());
+//
+//		// Properties properties = new Properties();
+//		// //启用调试
+//		// properties.setProperty("mail.debug", "true");
+//		//// 设置链接超时
+//		// properties.setProperty("mail.smtp.timeout", "1000");
+//
+//		// 设置SMTP端口
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.port", getEmailConfigure().getSmtpPort());
+//		// 开启认证 /设置是否使用SSL
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(getEmailConfigure().isSsl()));
+//		// 设置SSL端口
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", getEmailConfigure().getSslPort());
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
+//		// 避免出现认证错误
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
+//				"javax.net.ssl.SSLSocketFactory");
+//
+//		// 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "true");
+//
+//		/* 发送信息设置，取自入参 */
+//		mailSenderr.setDefaultEncoding("UTF-8");
+
     private static EmailConfigureData defaultConfig(Boolean debug) {
         final EmailConfigureData ec = new EmailConfigureData();
 
-        ec.setSmtpPort("465");
-        ec.setSsl(true);
+        ec.setSmtpPort(String.valueOf(EmailConstant.SMTP_PORT_465));
+        ec.setSsl(EmailConstant.DEFAULT_USE_SSL);
         ec.setPrintDurationTimer(false);
 
         return ec;
     }
 
-    /**
-     * 邮箱初始化的配置列
-     */
-//    private static Map<String, EmailConfigureData> esConfigMap = new ConcurrentHashMap<>();
-//    private static Session session;
-//    private static String  user;
-
     private MessageData emailMessage;
-//    private MimeMessage msg;
-//    private String             text;
-//    private String             html;
 //    private List<MimeBodyPart> attachments = new ArrayList<MimeBodyPart>();
 
     /**
@@ -151,22 +192,7 @@ public class OkEmail implements IOkEmail {
      *
      * @param subject subject title
      */
-    public static OkEmail subject(String subject) throws SendMailException {
-        //        Properties props = defaultConfigDel(false);
-//        props.put("mail.smtp.host", data.getHostName());
-//
-//        props.setProperty("username", data.getUserName());
-//        props.setProperty("password", data.getPassword());
-//
-//        user = data.getUserName();
-//        session = Session.getInstance(props, new Authenticator() {
-//            @Override
-//            protected PasswordAuthentication getPasswordAuthentication() {
-//                return new PasswordAuthentication(data.getUserName(), data.getPassword());
-//            }
-//        });
-
-
+    public static OkEmail subject(String subject) {
         // 每一次都是new的, 所以每一次请求的实体对象和数据均不一样. 故不存在并发问题
         OkEmail okEmail = new OkEmail();
         okEmail.emailMessage = new MessageData();
@@ -193,55 +219,18 @@ public class OkEmail implements IOkEmail {
             while(driversIterator.hasNext()) {
                 //加载并初始化实现
                 IEmailServer emailServer = driversIterator.next();
-                emailServer.sendSyn(emailMessage);
-            }
-        } catch(Throwable t) {
-            // Do nothing
-        }
-//
-//        if (text == null && html == null) {
-//            throw new IllegalArgumentException("At least one context has to be provided: Text or Html");
-//        }
-//
-//        MimeMultipart cover;
-//        boolean       usingAlternative = false;
-//        boolean       hasAttachments   = attachments.size() > 0;
-//
-//        try {
-//            if (text != null && html == null) {
-//                // TEXT ONLY
-//                cover = new MimeMultipart("mixed");
-//                cover.addBodyPart(textPart());
-//            } else if (text == null && html != null) {
-//                // HTML ONLY
-//                cover = new MimeMultipart("mixed");
-//                cover.addBodyPart(htmlPart());
-//            } else {
-//                // HTML + TEXT
-//                cover = new MimeMultipart("alternative");
-//                cover.addBodyPart(textPart());
-//                cover.addBodyPart(htmlPart());
-//                usingAlternative = true;
-//            }
-//
-//            MimeMultipart content = cover;
-//            if (usingAlternative && hasAttachments) {
-//                content = new MimeMultipart("mixed");
-//                content.addBodyPart(toBodyPart(cover));
-//            }
-//
-//            for (MimeBodyPart attachment : attachments) {
-//                content.addBodyPart(attachment);
-//            }
-//
-//            msg.setContent(content);
-//            msg.setSentDate(new Date());
-//            Transport.send(msg);
-//        } catch (Exception e) {
-//            throw new SendMailException(e);
-//        }
 
-        return true;
+                String msgId = emailServer.sendSyn(emailMessage);
+                log.debug("邮件发送成功:{}!", msgId);
+            }
+            return true;
+        } catch(Throwable t) {
+            log.error("邮件发送失败!", t);
+            // Do nothing
+            t.printStackTrace();
+        }
+
+        return false;
     }
 
     /**
@@ -318,45 +307,31 @@ public class OkEmail implements IOkEmail {
         return this;
     }
 
-//    public OkEmail attach(File file) throws SendMailException {
-//        attachments.add(createAttachment(file, null));
-//        return this;
-//    }
+    public OkEmail attach(File file) throws SendMailException {
+        attach(file, null);
+        return this;
+    }
 
-//    public OkEmail attach(File file, String fileName) throws SendMailException {
-//        attachments.add(createAttachment(file, fileName));
-//        return this;
-//    }
-//
-//    public OkEmail attachURL(URL url, String fileName) throws SendMailException {
-//        attachments.add(createURLAttachment(url, fileName));
-//        return this;
-//    }
-//
-//
-//    private MimeBodyPart createAttachment(File file, String fileName) throws SendMailException {
-//        MimeBodyPart attachmentPart = new MimeBodyPart();
-//        FileDataSource fds            = new FileDataSource(file);
-//        try {
-//            attachmentPart.setDataHandler(new DataHandler(fds));
-//            attachmentPart.setFileName(null == fileName ? MimeUtility.encodeText(fds.getName()) : MimeUtility.encodeText(fileName));
-//        } catch (Exception e) {
-//            throw new SendMailException(e);
-//        }
-//        return attachmentPart;
-//    }
-//
-//    private MimeBodyPart createURLAttachment(URL url, String fileName) throws SendMailException {
-//        MimeBodyPart attachmentPart = new MimeBodyPart();
-//
-//        DataHandler dataHandler = new DataHandler(url);
-//        try {
-//            attachmentPart.setDataHandler(dataHandler);
-//            attachmentPart.setFileName(null == fileName ? MimeUtility.encodeText(fileName) : MimeUtility.encodeText(fileName));
-//        } catch (Exception e) {
-//            throw new SendMailException(e);
-//        }
-//        return attachmentPart;
-//    }
+    public OkEmail attach(File file, String fileName) throws SendMailException {
+        FileMsgAttachmentEntry attachement = new FileMsgAttachmentEntry();
+        attachement.setUri(file);
+        attachement.setName(fileName);
+        attachement.setDescription(fileName);
+
+        emailMessage.attachement(attachement);
+
+        return this;
+    }
+
+    public OkEmail attachURL(URL url, String fileName) throws SendMailException {
+        URLMsgAttachmentEntry attachement = new URLMsgAttachmentEntry();
+        attachement.setUri(url);
+        attachement.setName(fileName);
+        attachement.setDescription(fileName);
+
+        emailMessage.attachement(attachement);
+
+        return this;
+    }
 
 }

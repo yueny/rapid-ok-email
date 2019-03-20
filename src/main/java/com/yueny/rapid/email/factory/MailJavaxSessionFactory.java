@@ -18,6 +18,7 @@ package com.yueny.rapid.email.factory;
 
 import com.google.common.collect.MapMaker;
 import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailConstant;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
@@ -31,18 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 public class MailJavaxSessionFactory {
     private static MailJavaxSessionFactory _instants = new MailJavaxSessionFactory();
 
-    private static Properties defaultConfig(Boolean debug) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.ssl.enable", "true");
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.debug", null != debug ? debug.toString() : "false");
-        props.put("mail.smtp.timeout", "10000");
-        props.put("mail.smtp.port", "465");
-        return props;
-    }
-
-    /**
+        /**
      * 添加
      * @param config
      * @return
@@ -67,8 +57,55 @@ public class MailJavaxSessionFactory {
         //.
     }
 
+    private static Properties defaultConfig(Boolean debug) {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", EmailConstant.DEFAULT_SMTP_AUTH);
+        props.put("mail.smtp.ssl.enable", EmailConstant.DEFAULT_USE_SSL);
+        props.put("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
+        props.put("mail.debug", null != debug ? debug.toString() : EmailConstant.DEFAULT_USE_DEBUG);
+        props.put("mail.smtp.timeout", EmailConstant.DEFAULT_SMTP_TIMEOUT);
+        props.put("mail.smtp.port", EmailConstant.SMTP_PORT_465);
+        return props;
+    }
+
+    //		/* 认证信息设置，取自配置 */
+//		// 设置SMTP服务器名称
+//		mailSender.setHost(getEmailConfigure().getHostName());
+//		// 设置SMTP端口
+//		mailSender.setPort(Integer.valueOf(getEmailConfigure().getSmtpPort()));
+//
+//		// Default is "smtp".
+//		// mailSender.setProtocol(protocol);
+//
+//		// 设置认证信息
+//		mailSender.setUsername(getEmailConfigure().getUserName());
+//        mailSender.setPassword(getEmailConfigure().getPassword());
+//
+//		// Properties properties = new Properties();
+//		// //启用调试
+//		// properties.setProperty("mail.debug", "true");
+//		//// 设置链接超时
+//		// properties.setProperty("mail.smtp.timeout", "1000");
+//
+//		// 设置SMTP端口
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.port", getEmailConfigure().getSmtpPort());
+//		// 开启认证 /设置是否使用SSL
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(getEmailConfigure().isSsl()));
+//		// 设置SSL端口
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", getEmailConfigure().getSslPort());
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
+//		// 避免出现认证错误
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
+//				"javax.net.ssl.SSLSocketFactory");
+//
+//		// 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
+//		mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "true");
+//
+//		/* 发送信息设置，取自入参 */
+//		mailSenderr.setDefaultEncoding("UTF-8");
+
     private void _create(EmailConfigureData config) {
-        if(config == null || !sessionConcurrentMap.containsKey(config.getUserName())) {
+        if(!sessionConcurrentMap.containsKey(config.getUserName())) {
             Properties props = defaultConfig(false);
             props.put("mail.smtp.host", config.getHostName());
 

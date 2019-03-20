@@ -1,23 +1,26 @@
 package com.yueny.rapid.email.sender.internals.tacitly;
 
-import com.yueny.rapid.email.OkEmail;
+import com.google.common.base.Joiner;
 import com.yueny.rapid.email.cluster.RandomLoadBalance;
 import com.yueny.rapid.email.config.EmailConfigureData;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.factory.MailConfigureFactory;
 import com.yueny.rapid.email.factory.MailJavaxSessionFactory;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
-import com.yueny.rapid.email.sender.entity.MessageData;
-import com.yueny.rapid.email.sender.entity.ThreadEmailEntry;
+import com.yueny.rapid.email.sender.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.*;
+import java.io.File;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -46,9 +49,9 @@ public class JavaxMailServer extends BaseEmailServer {
     }
 
     @Override
-    public String sendSyn(MessageData emailMessage) throws Exception {
+    public String sendSyn(MessageData emailMessage) throws SendMailException {
         if (emailMessage.getText() == null && emailMessage.getHtml() == null) {
-            throw new IllegalArgumentException("At least one context has to be provided: Text or Html");
+            throw new SendMailException("At least one context has to be provided: Text or Html");
         }
 
         List<MimeBodyPart> attachments = getAttachments(emailMessage);
@@ -91,6 +94,8 @@ public class JavaxMailServer extends BaseEmailServer {
             msg.setContent(content);
             msg.setSentDate(new Date());
             Transport.send(msg);
+        } catch (SendMailException e) {
+            throw e;
         } catch (Exception e) {
             log.error("邮件发送异常:", e);
             throw new SendMailException(e);
@@ -117,8 +122,20 @@ public class JavaxMailServer extends BaseEmailServer {
         return bodyPart;
     }
 
-    private List<MimeBodyPart> getAttachments(MessageData emailMessage) {
+    private List<MimeBodyPart> getAttachments(MessageData emailMessage) throws SendMailException {
         List<MimeBodyPart> attachments = new ArrayList<MimeBodyPart>();
+
+        for (BaseMsgAttachment baseMsgAttachment : emailMessage.getAttachements()) {
+            if(baseMsgAttachment.getType() == BaseMsgAttachment.Type.FILE){
+                FileMsgAttachmentEntry fileAttachment = (FileMsgAttachmentEntry)baseMsgAttachment;
+                attachments.add(createAttachment(fileAttachment.getUri(), fileAttachment.getName()));
+            }else if(baseMsgAttachment.getType() == BaseMsgAttachment.Type.URL){
+                URLMsgAttachmentEntry urlAttachment = (URLMsgAttachmentEntry)baseMsgAttachment;
+                attachments.add(createURLAttachment(urlAttachment.getUri(), urlAttachment.getName()));
+            }else{
+                log.warn("path 路径的附件, 暂不支持!");
+            }
+        }
 
         return attachments;
     }
@@ -149,16 +166,20 @@ public class JavaxMailServer extends BaseEmailServer {
             if(CollectionUtils.isNotEmpty(data.getBcc())){
                 addRecipients(message, data.getBcc(), Message.RecipientType.BCC);
             }
-
-
         } catch (Exception e) {
+            log.error("邮件发送异常: ", e);
+
             throw new SendMailException(e);
         }
     }
 
-    private Map.Entry<EmailConfigureData, MimeMessage> getMessage() {
+    private Map.Entry<EmailConfigureData, MimeMessage> getMessage() throws SendMailException {
         // 随机选一个有效配置
         EmailConfigureData data = new RandomLoadBalance().select(MailConfigureFactory.getAll());
+        // 如果未配置, 则直接抛出异常
+        if(data == null){
+            throw new SendMailException("邮箱基本配置异常, 请确认配置信息:"+ data);
+        }
 
         Session session = MailJavaxSessionFactory.get(data.getUserName());
 
@@ -175,9 +196,16 @@ public class JavaxMailServer extends BaseEmailServer {
      * @throws MessagingException
      */
     private void addRecipients(MimeMessage msg, List<String> recipients, Message.RecipientType type) throws MessagingException {
-        String result = recipients.toArray().toString().replace("(^\\[|\\]$)", "").replace(", ", ",");
-        // TODO
-        msg.setRecipients(type, InternetAddress.parse(result));
+        if(CollectionUtils.isEmpty(recipients)){
+            return;
+        }
+
+        if(CollectionUtils.size(recipients) == 1){
+            addRecipient(msg, recipients.get(0), type);
+        }else{
+            String result = Joiner.on(",").join(recipients);
+            msg.setRecipients(type, InternetAddress.parse(result));
+        }
     }
 
     /**
@@ -191,41 +219,29 @@ public class JavaxMailServer extends BaseEmailServer {
         msg.setRecipients(type, InternetAddress.parse(recipient.replace(";", ",")));
     }
 
-    //		/* 认证信息设置，取自配置 */
-//		// 设置SMTP服务器名称
-//		mailSender.setHost(getEmailConfigure().getHostName());
-//		// 设置SMTP端口
-//		mailSender.setPort(Integer.valueOf(getEmailConfigure().getSmtpPort()));
-//
-//		// Default is "smtp".
-//		// mailSender.setProtocol(protocol);
-//
-//		// 设置认证信息
-//		mailSender.setUsername(getEmailConfigure().getUserName());
-//        mailSender.setPassword(getEmailConfigure().getPassword());
-//
-//		// Properties properties = new Properties();
-//		// //启用调试
-//		// properties.setProperty("mail.debug", "true");
-//		//// 设置链接超时
-//		// properties.setProperty("mail.smtp.timeout", "1000");
-//
-//		// 设置SMTP端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.port", getEmailConfigure().getSmtpPort());
-//		// 开启认证 /设置是否使用SSL
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(getEmailConfigure().isSsl()));
-//		// 设置SSL端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", getEmailConfigure().getSslPort());
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
-//		// 避免出现认证错误
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
-//				"javax.net.ssl.SSLSocketFactory");
-//
-//		// 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "true");
-//
-//		/* 发送信息设置，取自入参 */
-//		mailSenderr.setDefaultEncoding("UTF-8");
+    private MimeBodyPart createAttachment(File file, String fileName) throws SendMailException {
+        MimeBodyPart attachmentPart = new MimeBodyPart();
+        FileDataSource fds            = new FileDataSource(file);
+        try {
+            attachmentPart.setDataHandler(new DataHandler(fds));
+            attachmentPart.setFileName(null == fileName ? MimeUtility.encodeText(fds.getName()) : MimeUtility.encodeText(fileName));
+        } catch (Exception e) {
+            throw new SendMailException(e);
+        }
+        return attachmentPart;
+    }
 
+    private MimeBodyPart createURLAttachment(URL url, String fileName) throws SendMailException {
+        MimeBodyPart attachmentPart = new MimeBodyPart();
+
+        DataHandler dataHandler = new DataHandler(url);
+        try {
+            attachmentPart.setDataHandler(dataHandler);
+            attachmentPart.setFileName(null == fileName ? MimeUtility.encodeText(fileName) : MimeUtility.encodeText(fileName));
+        } catch (Exception e) {
+            throw new SendMailException(e);
+        }
+        return attachmentPart;
+    }
 
 }

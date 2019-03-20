@@ -20,12 +20,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @NoArgsConstructor
 public class MessageData {
-//	/**
-//	 * 附件列表<br>
-//	 * 非必传
-//	 */
-//	private final List<EmailMessageAttachmentEntry> attachements = new ArrayList<>();
-
 	/**
 	 * 字符集<br>
 	 * 非必传
@@ -96,15 +90,16 @@ public class MessageData {
 	 @Singular("replyTo")
 	 private List<String> replyTo = new ArrayList<String>();
 
-//	/**
-//	 * 邮件类型，默认为PLAIN
-//	 */
-//	@Setter
-//	private EmailType type = EmailType.PLAIN;
+	/**
+	 * 附件列表<br>
+	 * 非必传
+	 */
+	@Singular("attachements")
+	private List<BaseMsgAttachment> attachements = new ArrayList<>();
 
-//	public void attachement(final EmailMessageAttachmentEntry attachment) {
-//		this.attachements.add(attachment);
-//	}
+	public void attachement(final BaseMsgAttachment attachment) {
+		this.attachements.add(attachment);
+	}
 
 	public void bcc(final String bcc) {
 		this.bcc.add(bcc);
@@ -125,7 +120,7 @@ public class MessageData {
 	}
 	public void replyTo(final String... replyTo) {
 		for(String rt : replyTo){
-			replyTo(rt.replace(";", ","));
+			replyTo(rt);
 		}
 	}
 

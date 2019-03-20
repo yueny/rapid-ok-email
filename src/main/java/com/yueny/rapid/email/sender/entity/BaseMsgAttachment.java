@@ -5,7 +5,6 @@ package com.yueny.rapid.email.sender.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -17,8 +16,7 @@ import java.io.Serializable;
  * @DATE 2017年12月14日 下午8:31:32
  *
  */
-@ToString
-public class EmailMessageAttachmentEntry implements Serializable {
+public abstract class BaseMsgAttachment<T> implements Serializable {
 	/**
 	 *
 	 */
@@ -31,12 +29,6 @@ public class EmailMessageAttachmentEntry implements Serializable {
 	@Setter
 	private String description;
 	/**
-	 * 邮件Id
-	 */
-	@Getter
-	@Setter
-	private String emailId;
-	/**
 	 * 附件名称.
 	 */
 	@Getter
@@ -44,10 +36,26 @@ public class EmailMessageAttachmentEntry implements Serializable {
 	private String name;
 
 	/**
+	 * 附件类型
+	 */
+	@Getter
+	private Type type;
+
+	/**
 	 * 附件路径.
 	 */
 	@Getter
 	@Setter
-	private String path;
+	private T uri;
+
+	protected void setType(Type type){
+		this.type = type;
+	}
+
+	public enum Type{
+		URL,
+		PATH,
+		FILE;
+	}
 
 }
