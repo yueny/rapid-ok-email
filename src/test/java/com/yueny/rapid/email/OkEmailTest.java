@@ -28,7 +28,7 @@ import java.util.Map;
 public class OkEmailTest {
 
     // 该邮箱修改为你需要测试的邮箱地址
-    private static final String TO_EMAIL = "yuany@aicaigroup.com";
+    private static final String TO_EMAIL = "yuany@.com";
 
     @Before
     public void before() {

@@ -29,7 +29,7 @@
 //	@Test
 //	public void testAttach() throws Exception {
 //		final EmailMessage emailMessage = new EmailMessage("测试附件信息", "测试附件信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //
 //		// final EmailMessageAttachment attachment = new
 //		// EmailMessageAttachment();
@@ -53,9 +53,9 @@
 //	@Test
 //	public void testBcc() throws Exception {
 //		final EmailMessage emailMessage = new EmailMessage("测试密送信息", "测试密送信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //		// 密送
-//		emailMessage.bcc("yuany@aicaigroup.com");
+//		emailMessage.bcc("yuany@.com");
 //
 //		EmailTemplateSenderHelper.send(emailMessage);
 //	}
@@ -68,10 +68,10 @@
 //	@Test
 //	public void testCC() throws Exception {
 //		final EmailMessage emailMessage = new EmailMessage("测试抄送信息", "测试抄送信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //		// 抄送
-//		emailMessage.cc("yuany@aicaigroup.com");
-//
+//		emailMessage.cc("yuany@.com");
+
 //		EmailTemplateSenderHelper.send(emailMessage);
 //	}
 //
@@ -98,7 +98,7 @@
 //		content = StringUtils.replace(email_, "${content}", content);// 替换模板中的正文
 //
 //		final EmailMessage emailMessage = new EmailMessage(content, "测试html信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //		emailMessage.setType(EmailType.HTML);
 //
 //		EmailTemplateSenderHelper.send(emailMessage);
@@ -112,7 +112,7 @@
 //	@Test
 //	public void testTextEmail() throws Exception {
 //		final EmailMessage emailMessage = new EmailMessage("我的文本信息", "测试文本信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //
 //		EmailTemplateSenderHelper.send(emailMessage);
 //		Thread.sleep(10000);
@@ -160,7 +160,7 @@
 //	@Test
 //	public void testTextEmailForTemplate() throws Exception {
 //		final EmailMessageForTemplate emailMessage = new EmailMessageForTemplate("我的文本信息", "测试文本信息");
-//		emailMessage.to("yuany@aicaigroup.com");
+//		emailMessage.to("yuany@.com");
 //		emailMessage.to("deep_blue_yang@163.com");
 //		emailMessage.setType(EmailType.HTML);
 //
