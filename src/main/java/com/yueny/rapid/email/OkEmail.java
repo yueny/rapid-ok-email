@@ -2,6 +2,7 @@ package com.yueny.rapid.email;
 
 import com.yueny.rapid.email.config.EmailConfigureData;
 import com.yueny.rapid.email.config.EmailConstant;
+import com.yueny.rapid.email.context.engine.*;
 import com.yueny.rapid.email.encrypt.EncryptedEmailPasswordCallback;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.factory.MailConfigureFactory;
@@ -28,11 +29,18 @@ import java.util.*;
 public class OkEmail implements IOkEmail {
     private static String xmlPath = "/email/email-config.xml";
 
+    private static IEngine jetEngine = null;
+    private static IEngine pebbleEngine = null;
+    private static IEngine freemarkEngine = null;
     static {
         EmailConfigureData ec = init();
         if(ec != null) {
             MailConfigureFactory.register(ec);
         }
+
+        jetEngine = new JetEngineImpl();
+        pebbleEngine = new PebbleEngineImpl();
+        freemarkEngine = new FreemarkEngineImpl();
     }
 
     /**
@@ -303,6 +311,24 @@ public class OkEmail implements IOkEmail {
     }
 
     public OkEmail html(String html) {
+        emailMessage.setHtml(html);
+        return this;
+    }
+    public OkEmail html(EngineType type, String name, Map<String, Object> context) {
+        String html = "";
+
+        try{
+            if(type == EngineType.JET){
+                html = jetEngine.render(name, context);
+            }else if(type == EngineType.PEBBLE){
+                html = pebbleEngine.render(name, context);
+            } else if(type == EngineType.FREEMARKER){
+                html = freemarkEngine.render(name, context);
+            }
+        } catch(Exception e){
+            //.
+        }
+
         emailMessage.setHtml(html);
         return this;
     }

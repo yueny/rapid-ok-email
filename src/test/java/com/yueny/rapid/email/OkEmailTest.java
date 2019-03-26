@@ -1,20 +1,16 @@
 package com.yueny.rapid.email;
 
-import com.mitchellbosecke.pebble.PebbleEngine;
-import com.mitchellbosecke.pebble.error.PebbleException;
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import com.yueny.rapid.email.context.engine.EngineType;
+import com.yueny.rapid.email.context.engine.FreemarkEngineImpl;
+import com.yueny.rapid.email.context.engine.JetEngineImpl;
+import com.yueny.rapid.email.context.engine.PebbleEngineImpl;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.util.MailSmtpType;
-import jetbrick.template.JetEngine;
-import jetbrick.template.JetTemplate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -79,60 +75,52 @@ public class OkEmailTest {
     }
 
     @Test
-    public void testPebble() throws IOException, PebbleException, SendMailException {
-        PebbleEngine   engine           = new PebbleEngine.Builder().build();
-        PebbleTemplate compiledTemplate = engine.getTemplate("register.html");
+    public void testFreemark() throws Exception {
+        final Map<String, Object> context = new HashMap<>();
+        context.put("userName", "鸳鸯");
 
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("username", "guest");
-        context.put("email", "admin@guest.me");
-
-        Writer writer = new StringWriter();
-        compiledTemplate.evaluate(writer, context);
-
-        String output = writer.toString();
-        System.out.println(output);
-
-        OkEmail.subject("这是一封测试Pebble模板邮件")
+        FreemarkEngineImpl engine = new FreemarkEngineImpl();
+        OkEmail.subject("这是一封测试 Freemark 模板邮件")
                 .from("小姐姐的邮箱")
                 .to(TO_EMAIL)
                 .cc(TO_EMAIL, "deep_blue_yang@126.com")
-                .html(output)
+//                .html(engine.render("register.html", context))
+                .html(EngineType.FREEMARKER, "demo.ftl", context)
                 .send();
         Assert.assertTrue(true);
     }
 
     @Test
-    public void testJetx() throws IOException, PebbleException, SendMailException {
-//        PebbleEngine   engine           = new PebbleEngine.Builder().build();
-//        PebbleTemplate compiledTemplate = engine.getTemplate("register.html");
-//
-//        Map<String, Object> context = new HashMap<String, Object>();
-//        context.put("username", "guest");
-//        context.put("email", "admin@guest.me");
-//
-//        Writer writer = new StringWriter();
-//        compiledTemplate.evaluate(writer, context);
+    public void testPebble() throws Exception {
+        Map<String, Object> context = new HashMap<String, Object>();
+        context.put("username", "guest");
+        context.put("email", "admin@guest.me");
 
-        JetEngine   engine   = JetEngine.create();
-        JetTemplate template = engine.getTemplate("/register.jetx");
+        PebbleEngineImpl engine = new PebbleEngineImpl();
+        OkEmail.subject("这是一封测试Pebble模板邮件")
+                .from("小姐姐的邮箱")
+                .to(TO_EMAIL)
+                .cc(TO_EMAIL, "deep_blue_yang@126.com")
+//                .html(engine.render("register.html", context))
+                .html(EngineType.PEBBLE, "register.html", context)
+                .send();
+        Assert.assertTrue(true);
+    }
 
+    @Test
+    public void testJetx() throws Exception {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("username", "guest");
         context.put("email", "admin@guest.me");
         context.put("url", "<a href='http://guest.me'>https://guest.me/active/guest</a>");
 
-        StringWriter writer = new StringWriter();
-        template.render(context, writer);
-
-        String output = writer.toString();
-        System.out.println(output);
+        JetEngineImpl engine   = new JetEngineImpl();
 
         OkEmail.subject("这是一封测试Jetx模板邮件")
                 .from("小姐姐的邮箱")
                 .to(TO_EMAIL, "deep_blue_yang@126.com")
                 .bcc(TO_EMAIL)
-                .html(output)
+                .html(engine.render("/register.jetx", context))
                 .send();
         Assert.assertTrue(true);
     }
