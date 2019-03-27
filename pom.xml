@@ -57,13 +57,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.yueny.rapid.lang</groupId>
+			<groupId>com.yueny.rapid</groupId>
 			<artifactId>rapid-lang-util</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.yueny.rapid.util</groupId>
-			<artifactId>rapid-util-crypt</artifactId>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-crypt</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 
