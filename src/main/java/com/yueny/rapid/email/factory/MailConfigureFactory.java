@@ -16,9 +16,8 @@
  */
 package com.yueny.rapid.email.factory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
 import com.yueny.rapid.email.config.EmailConfigureData;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * MailConfigureFactory
  */
+@Slf4j
 public class MailConfigureFactory {
     private static MailConfigureFactory _instants = new MailConfigureFactory();
 
@@ -83,6 +83,11 @@ public class MailConfigureFactory {
 
             //创建session
             MailJavaxSessionFactory.create(config);
+
+            if(config.isDebug()){
+                log.debug("注册新的邮箱服务:{}", config);
+            }
+
             return true;
         }
 
@@ -95,8 +100,24 @@ public class MailConfigureFactory {
 
     private boolean _refresh(String userName, String password, String hostName) {
         if(_exist(userName)){
-            emailConfigureDataConcurrentMap.get(userName).setHostName(hostName);
-            emailConfigureDataConcurrentMap.get(userName).setPassword(password);
+            EmailConfigureData oldConfig = emailConfigureDataConcurrentMap.get(userName);
+
+            EmailConfigureData.EmailConfigureDataBuilder builder = EmailConfigureData.builder()
+                    .alias(oldConfig.getAlias())
+                    .from(oldConfig.getFrom())
+                    .userName(oldConfig.getUserName())
+                    .decrypt(oldConfig.isDecrypt())
+                    .smtpPort(oldConfig.getSmtpPort())
+                    .ssl(oldConfig.isSsl())
+                    .sslPort(oldConfig.getSslPort())
+                    .smtpPort(oldConfig.getSslPort())
+                    .printDurationTimer(oldConfig.isPrintDurationTimer())
+                    .debug(oldConfig.isDebug())
+                    .hostName(hostName)
+                    .password(password);
+
+            emailConfigureDataConcurrentMap.put(userName, builder.build());
+            oldConfig = null;
 
             MailJavaxSessionFactory.refresh(userName, password, hostName);
             return true;

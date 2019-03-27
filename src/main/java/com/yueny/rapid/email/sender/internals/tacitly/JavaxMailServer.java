@@ -94,6 +94,10 @@ public class JavaxMailServer extends BaseEmailServer {
             msg.setContent(content);
             msg.setSentDate(new Date());
             Transport.send(msg);
+
+            if(msgMap.getKey().isDebug()){
+                log.debug("邮件发送结束, 发送流程结束.");
+            }
         } catch (SendMailException e) {
             throw e;
         } catch (Exception e) {

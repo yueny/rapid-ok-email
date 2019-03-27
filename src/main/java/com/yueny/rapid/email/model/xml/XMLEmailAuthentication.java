@@ -37,10 +37,10 @@ public class XMLEmailAuthentication {
 	/**
 	 * 设置密码是否加密，默认不加密
 	 */
-	@XmlAttribute(name = "decrypt", required = false)
+	@XmlAttribute(name = "decrypt")
 	@Getter
 	@Setter
-	private Boolean decrypt = false;
+	private Boolean decrypt;
 	/**
 	 * 认证用户密码
 	 */

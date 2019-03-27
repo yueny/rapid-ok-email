@@ -54,32 +54,37 @@ public class OkEmail implements IOkEmail {
             final XMLEmailConfiguration emailDefaultConfiguration = JAXB.unmarshal(reader, XMLEmailConfiguration.class);
             log.debug("读取到的email配置: {}.", emailDefaultConfiguration);
 
-            final EmailConfigureData ec = new EmailConfigureData();
-            ec.setAlias(emailDefaultConfiguration.getAlias());
-            ec.setFrom(emailDefaultConfiguration.getFrom());
-            ec.setHostName(emailDefaultConfiguration.getHostName());
+            EmailConfigureData.EmailConfigureDataBuilder builder = EmailConfigureData.builder()
+                    .alias(emailDefaultConfiguration.getAlias())
+                    .from(emailDefaultConfiguration.getFrom())
+                    .hostName(emailDefaultConfiguration.getHostName())
+                    .userName(emailDefaultConfiguration.getAuth().getUserName())
+                    .decrypt(emailDefaultConfiguration.getAuth().getDecrypt())
+                    .smtpPort(emailDefaultConfiguration.getSmtpPort())
+                    .ssl(emailDefaultConfiguration.getSsl())
+                    .sslPort(emailDefaultConfiguration.getSslPort());
 
-            ec.setUserName(emailDefaultConfiguration.getAuth().getUserName());
-            ec.setDecrypt(emailDefaultConfiguration.getAuth().getDecrypt());
-            if (ec.isDecrypt()) {
+            if (emailDefaultConfiguration.getAuth().getDecrypt()) {
                 final String dePasswd = emailDefaultConfiguration.getAuth().getPassword();
                 // 密码解密
                 final String pas = EncryptedEmailPasswordCallback.decrypt(dePasswd);
-                ec.setPassword(pas);
+                builder.password(pas);
             }else{
-                ec.setPassword(emailDefaultConfiguration.getAuth().getPassword());
+                builder.password(emailDefaultConfiguration.getAuth().getPassword());
             }
-
-            ec.setSmtpPort(emailDefaultConfiguration.getSmtpPort());
-            ec.setSsl(emailDefaultConfiguration.getSsl());
-            ec.setSslPort(emailDefaultConfiguration.getSslPort());
 
             // config
             if (emailDefaultConfiguration.getConfig() != null) {
-                ec.setPrintDurationTimer(emailDefaultConfiguration.getConfig().getPrintDurationTimer());
+                builder.printDurationTimer(emailDefaultConfiguration.getConfig().getPrintDurationTimer());
+                builder.debug(emailDefaultConfiguration.getConfig().getDebug());
             }
 
-            return ec;
+            EmailConfigureData config = builder.build();
+            if(config.isDebug()){
+                log.debug("读取到的email配置组装完成: {}.", config);
+            }
+
+            return config;
         } catch (final Exception e) {
             log.error("加载配置异常，默认配置置为空！", e);
         } finally {
@@ -136,10 +141,7 @@ public class OkEmail implements IOkEmail {
         if(MailConfigureFactory.exist(username)){
             MailConfigureFactory.refresh(username, pw, mailType.getHostName());
         }else{
-            EmailConfigureData ec = defaultConfig(debug);
-            ec.setHostName(mailType.getHostName());
-            ec.setUserName(username);
-            ec.setPassword(pw);
+            EmailConfigureData ec = defaultConfig(mailType.getHostName(), username, password, debug);
 
             MailConfigureFactory.register(ec);
         }
@@ -182,14 +184,15 @@ public class OkEmail implements IOkEmail {
 //		/* 发送信息设置，取自入参 */
 //		mailSenderr.setDefaultEncoding("UTF-8");
 
-    private static EmailConfigureData defaultConfig(Boolean debug) {
-        final EmailConfigureData ec = new EmailConfigureData();
-
-        ec.setSmtpPort(String.valueOf(EmailConstant.SMTP_PORT_465));
-        ec.setSsl(EmailConstant.DEFAULT_USE_SSL);
-        ec.setPrintDurationTimer(false);
-
-        return ec;
+    private static EmailConfigureData defaultConfig(String hostName, String userName, String password, Boolean debug) {
+        return EmailConfigureData.builder()
+                .hostName(hostName)
+                .userName(userName)
+                .password(password)
+                .smtpPort(String.valueOf(EmailConstant.SMTP_PORT_465))
+                .ssl(EmailConstant.DEFAULT_USE_SSL)
+                .printDurationTimer(false)
+                .build();
     }
 
     private MessageData emailMessage;
@@ -229,7 +232,8 @@ public class OkEmail implements IOkEmail {
                 IEmailServer emailServer = driversIterator.next();
 
                 String msgId = emailServer.sendSyn(emailMessage);
-                log.debug("邮件发送成功:{}!", msgId);
+
+                log.debug("邮件发送成功, msgId:{}!", msgId);
             }
             return true;
         } catch(Throwable t) {

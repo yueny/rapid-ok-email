@@ -55,11 +55,6 @@ public class XMLEmailConfiguration {
 	private String alias;
 
 	/**
-	 * 设置密码是否加密，默认不加密
-	 */
-	@XmlElement(name = "decrypt")
-	private Boolean decrypt = false;
-	/**
 	 * 设置缺省的FROM地址
 	 */
 	@XmlElement(name = "from")

@@ -66,6 +66,11 @@
 			<artifactId>rapid-lang-crypt</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-mask</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<!-- 日志扩展  -->
 		<dependency>

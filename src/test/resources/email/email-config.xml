@@ -23,6 +23,7 @@
 	
 	<!-- ÅäÖÃÏî -->
 	<config print-duration-timer="true">
+		<debug>true</debug>
 	</config>
 	
 </email>

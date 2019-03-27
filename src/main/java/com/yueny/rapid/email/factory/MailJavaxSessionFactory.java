@@ -19,6 +19,7 @@ package com.yueny.rapid.email.factory;
 import com.google.common.collect.MapMaker;
 import com.yueny.rapid.email.config.EmailConfigureData;
 import com.yueny.rapid.email.config.EmailConstant;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
@@ -29,6 +30,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * MailJavaxSessionFactory
  */
+@Slf4j
 public class MailJavaxSessionFactory {
     private static MailJavaxSessionFactory _instants = new MailJavaxSessionFactory();
 
@@ -120,6 +122,10 @@ public class MailJavaxSessionFactory {
             });
 
             sessionConcurrentMap.put(config.getUserName(), session);
+
+            if(config.isDebug()){
+                log.debug("创建邮箱 {} Session服务.", config.getUserName());
+            }
         }
     }
 

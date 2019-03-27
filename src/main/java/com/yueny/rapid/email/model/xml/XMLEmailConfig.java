@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 /**
  *
@@ -46,9 +43,17 @@ public class XMLEmailConfig {
 	 * EmailTemplateSenderHelper辅助服务的耗时打印不受控制。<br>
 	 * 默认不打印
 	 */
-	@XmlAttribute(name = "print-duration-timer")
+	@XmlAttribute(name = "print-duration-timer", required = false)
 	@Getter
 	@Setter
 	private Boolean printDurationTimer = false;
+
+	/**
+	 * 是否开启调试模式<br>
+	 */
+	@XmlElement(name = "debug", required = false)
+	@Getter
+	@Setter
+	private Boolean debug = false;
 
 }

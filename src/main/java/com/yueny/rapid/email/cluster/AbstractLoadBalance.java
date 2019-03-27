@@ -1,6 +1,8 @@
 package com.yueny.rapid.email.cluster;
 
 import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.exception.SendMailException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 /**
  * AbstractLoadBalance
  */
+@Slf4j
 public abstract class AbstractLoadBalance implements LoadEmailBalance {
     /**
      * Calculate the weight according to the uptime proportion of warmup time
@@ -34,7 +37,17 @@ public abstract class AbstractLoadBalance implements LoadEmailBalance {
             return invokers.get(0);
         }
 
-        return invokers.get(0);
+        EmailConfigureData config = invokers.get(0);
+        if(config == null){
+            return null;
+        }
+
+        if(config.isDebug()){
+            log.debug("选取预发送邮件的邮箱服务:{}", config);
+        }
+
+        return config;
+
 //        return doSelect(invokers, url, invocation);
     }
 
