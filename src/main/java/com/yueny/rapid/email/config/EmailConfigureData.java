@@ -7,7 +7,6 @@ import com.yueny.rapid.lang.mask.annotation.Mask;
 import com.yueny.rapid.lang.mask.pojo.instance.AbstractMaskBo;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  * email配置类

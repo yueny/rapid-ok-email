@@ -32,10 +32,6 @@ public class EmailConstant {
 	 */
 	public static final String DEFAULT_TRANSPORT_PROTOCOL = "smtp";
 	/**
-	 * 默认开启bug模式, 默认不开启
-	 */
-	public static final boolean DEFAULT_USE_DEBUG = false;
-	/**
 	 * 默认超时时间
 	 */
 	public static final int DEFAULT_SMTP_TIMEOUT = 10000;

@@ -59,14 +59,29 @@ public class MailJavaxSessionFactory {
         //.
     }
 
-    private static Properties defaultConfig(Boolean debug) {
+    private static Properties defaultConfig(EmailConfigureData config) {
         Properties props = new Properties();
+
+        // 需要身份验证. 缺省是false，如果为true，尝试使用AUTH命令认证用户。
         props.put("mail.smtp.auth", EmailConstant.DEFAULT_SMTP_AUTH);
-        props.put("mail.smtp.ssl.enable", EmailConstant.DEFAULT_USE_SSL);
+        props.put("mail.smtp.ssl.enable", config.isSsl());
+        // 要装入session的协议（smtp、pop3、imap、nntp）
         props.put("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
-        props.put("mail.debug", null != debug ? debug.toString() : EmailConstant.DEFAULT_USE_DEBUG);
+        //设置调试模式可以在控制台查看发送过程
+        props.put("mail.debug", config.isDebug());
+
+        // Socket连接超时值，单位毫秒，缺省值不超时。
+        props.put("mail.smtp.connectiontimeout", EmailConstant.DEFAULT_SMTP_TIMEOUT);
+        // Socket I/O超时值，单位毫秒，缺省值不超时
         props.put("mail.smtp.timeout", EmailConstant.DEFAULT_SMTP_TIMEOUT);
-        props.put("mail.smtp.port", EmailConstant.SMTP_PORT_465);
+
+        // 要连接的SMTP服务器的端口号，如果connect没有指明端口号就使用它，缺省值25。
+        props.put("mail.smtp.port", String.valueOf(config.getSmtpPort()));
+        props.setProperty("mail.smtp.socketFactory.port", String.valueOf(config.getSmtpPort()));
+
+        //使用JSSE的SSL socketfactory来取代默认的socketfactory
+//        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
         return props;
     }
 
@@ -108,7 +123,8 @@ public class MailJavaxSessionFactory {
 
     private void _create(EmailConfigureData config) {
         if(!sessionConcurrentMap.containsKey(config.getUserName())) {
-            Properties props = defaultConfig(false);
+            Properties props = defaultConfig(config);
+            // 要连接的SMTP服务器
             props.put("mail.smtp.host", config.getHostName());
 
             props.setProperty("username", config.getUserName());
@@ -120,6 +136,8 @@ public class MailJavaxSessionFactory {
                     return new PasswordAuthentication(config.getUserName(), config.getPassword());
                 }
             });
+            // 置true可以在控制台（console)上看到发送邮件的过程
+            session.setDebug(config.isDebug());
 
             sessionConcurrentMap.put(config.getUserName(), session);
 
@@ -130,29 +148,24 @@ public class MailJavaxSessionFactory {
     }
 
     private void _refresh(String userName, String password, String hostName) {
-        Properties props = defaultConfig(false);
-        props.put("mail.smtp.host", hostName);
-
-        props.setProperty("username", userName);
-        props.setProperty("password", password);
-
         if(!sessionConcurrentMap.containsKey(userName)) {
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, password);
-                }
-            });
-
-            sessionConcurrentMap.put(userName, session);
+            // 之前不存在, 则不刷新
+            return;
         }else{
             Session session = sessionConcurrentMap.get(userName);
+            Properties props = session.getProperties();
+            props.put("mail.smtp.host", hostName);
+
+            props.setProperty("username", userName);
+            props.setProperty("password", password);
+
             session = Session.getInstance(props, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(userName, password);
                 }
             });
+            sessionConcurrentMap.put(userName, session);
         }
     }
 

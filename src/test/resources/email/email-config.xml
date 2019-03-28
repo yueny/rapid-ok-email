@@ -7,7 +7,7 @@
     <!-- 设置SMTP服务器名称 -->
 	<host-name>smtp.126.com</host-name>
 	<!-- 设置非SSL协议SMTP端口 -->
-	<smtp-port>25</smtp-port>
+	<smtp-port>465</smtp-port>
 	<!-- 设置是否使用SSL -->
 	<ssl>true</ssl>
 	<!-- 设置SSL协议SMTP端口 -->
