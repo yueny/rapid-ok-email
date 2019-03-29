@@ -1,7 +1,6 @@
 package com.yueny.rapid.email.cluster;
 
-import com.yueny.rapid.email.config.EmailConfigureData;
-import com.yueny.rapid.email.exception.SendMailException;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -27,7 +26,7 @@ public abstract class AbstractLoadBalance implements LoadEmailBalance {
     }
 
     @Override
-    public EmailConfigureData select(List<EmailConfigureData> invokers) {
+    public EmailInnerConfigureData select(List<EmailInnerConfigureData> invokers) {
         // 如果未配置, 则返回空
         if (CollectionUtils.isEmpty(invokers)) {
             return null;
@@ -37,7 +36,7 @@ public abstract class AbstractLoadBalance implements LoadEmailBalance {
             return invokers.get(0);
         }
 
-        EmailConfigureData config = invokers.get(0);
+        EmailInnerConfigureData config = invokers.get(0);
         if(config == null){
             return null;
         }

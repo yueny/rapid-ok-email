@@ -16,7 +16,7 @@
  */
 package com.yueny.rapid.email.cluster;
 
-import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 
 import java.util.List;
 
@@ -33,5 +33,5 @@ public interface LoadEmailBalance {
      * @param invokers   invokers.
      * @return selected invoker.
      */
-    EmailConfigureData select(List<EmailConfigureData> invokers);
+    EmailInnerConfigureData select(List<EmailInnerConfigureData> invokers);
 }

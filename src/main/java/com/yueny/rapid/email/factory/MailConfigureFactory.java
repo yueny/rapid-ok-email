@@ -16,7 +16,7 @@
  */
 package com.yueny.rapid.email.factory;
 
-import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class MailConfigureFactory {
      * @param config
      * @return
      */
-    public static boolean register(EmailConfigureData config) {
+    public static boolean register(EmailInnerConfigureData config) {
         return _instants._register(config);
     }
 
@@ -63,21 +63,21 @@ public class MailConfigureFactory {
         return _instants._refresh(userName, password, hostName);
     }
 
-    public static List<EmailConfigureData> getAll() {
+    public static List<EmailInnerConfigureData> getAll() {
         return _instants._getAll();
     }
 
 //    // 使用WeakValueMap，当Value被垃圾回收时会将此value在map中的entry清除，防止内存溢出
-//    private ConcurrentMap<String, EmailConfigureData> emailConfigureDataConcurrentMap =
+//    private ConcurrentMap<String, EmailInnerConfigureData> emailConfigureDataConcurrentMap =
 //            new MapMaker().weakValues().makeMap();
-    private ConcurrentMap<String, EmailConfigureData> emailConfigureDataConcurrentMap =
+    private ConcurrentMap<String, EmailInnerConfigureData> emailConfigureDataConcurrentMap =
         new ConcurrentHashMap<>();
 
     public MailConfigureFactory() {
         //.
     }
 
-    private boolean _register(EmailConfigureData config) {
+    private boolean _register(EmailInnerConfigureData config) {
         if(!emailConfigureDataConcurrentMap.containsKey(config.getUserName())){
             emailConfigureDataConcurrentMap.putIfAbsent(config.getUserName(), config);
 
@@ -100,9 +100,9 @@ public class MailConfigureFactory {
 
     private boolean _refresh(String userName, String password, String hostName) {
         if(_exist(userName)){
-            EmailConfigureData oldConfig = emailConfigureDataConcurrentMap.get(userName);
+            EmailInnerConfigureData oldConfig = emailConfigureDataConcurrentMap.get(userName);
 
-            EmailConfigureData.EmailConfigureDataBuilder builder = EmailConfigureData.builder()
+            EmailInnerConfigureData.EmailConfigureDataBuilder builder = EmailInnerConfigureData.builder()
                     .alias(oldConfig.getAlias())
                     .from(oldConfig.getFrom())
                     .userName(oldConfig.getUserName())
@@ -110,7 +110,6 @@ public class MailConfigureFactory {
                     .smtpPort(oldConfig.getSmtpPort())
                     .ssl(oldConfig.isSsl())
                     .sslPort(oldConfig.getSslPort())
-                    .smtpPort(oldConfig.getSslPort())
                     .printDurationTimer(oldConfig.isPrintDurationTimer())
                     .debug(oldConfig.isDebug())
                     .hostName(hostName)
@@ -126,11 +125,11 @@ public class MailConfigureFactory {
         return false;
     }
 
-    private List<EmailConfigureData> _getAll() {
+    private List<EmailInnerConfigureData> _getAll() {
         //此处每次以相同用户发送email时, 只实例化一次
-        List<EmailConfigureData> list = new ArrayList<>(emailConfigureDataConcurrentMap.size());
+        List<EmailInnerConfigureData> list = new ArrayList<>(emailConfigureDataConcurrentMap.size());
 
-        Collection<EmailConfigureData> data = emailConfigureDataConcurrentMap.values();
+        Collection<EmailInnerConfigureData> data = emailConfigureDataConcurrentMap.values();
         list.addAll(data);
 
         return Collections.unmodifiableList(list);

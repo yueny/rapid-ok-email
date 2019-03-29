@@ -17,7 +17,7 @@
 package com.yueny.rapid.email.factory;
 
 import com.google.common.collect.MapMaker;
-import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import com.yueny.rapid.email.config.EmailConstant;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ public class MailJavaxSessionFactory {
      * @param config
      * @return
      */
-    public static void create(EmailConfigureData config) {
+    public static void create(EmailInnerConfigureData config) {
         _instants._create(config);
     }
 
@@ -59,28 +59,29 @@ public class MailJavaxSessionFactory {
         //.
     }
 
-    private static Properties defaultConfig(EmailConfigureData config) {
+    private static Properties defaultConfig(EmailInnerConfigureData config) {
         Properties props = new Properties();
 
         // 需要身份验证. 缺省是false，如果为true，尝试使用AUTH命令认证用户。
-        props.put("mail.smtp.auth", EmailConstant.DEFAULT_SMTP_AUTH);
-        props.put("mail.smtp.ssl.enable", config.isSsl());
+        props.setProperty("mail.smtp.auth", String.valueOf(EmailConstant.DEFAULT_SMTP_AUTH));
+        props.setProperty("mail.smtp.ssl.enable", String.valueOf(config.isSsl()));
         // 要装入session的协议（smtp、pop3、imap、nntp）
-        props.put("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
+        props.setProperty("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
         //设置调试模式可以在控制台查看发送过程
         props.put("mail.debug", config.isDebug());
 
         // Socket连接超时值，单位毫秒，缺省值不超时。
-        props.put("mail.smtp.connectiontimeout", EmailConstant.DEFAULT_SMTP_TIMEOUT);
+        props.setProperty("mail.smtp.connectiontimeout", String.valueOf(EmailConstant.DEFAULT_SMTP_TIMEOUT));
         // Socket I/O超时值，单位毫秒，缺省值不超时
-        props.put("mail.smtp.timeout", EmailConstant.DEFAULT_SMTP_TIMEOUT);
+        props.setProperty("mail.smtp.timeout", String.valueOf(EmailConstant.DEFAULT_SMTP_TIMEOUT));
 
         // 要连接的SMTP服务器的端口号，如果connect没有指明端口号就使用它，缺省值25。
-        props.put("mail.smtp.port", String.valueOf(config.getSmtpPort()));
-        props.setProperty("mail.smtp.socketFactory.port", String.valueOf(config.getSmtpPort()));
+        props.setProperty("mail.smtp.port", config.getSmtpPort());
+        props.setProperty("mail.smtp.socketFactory.port", config.getSslPort());
 
-        //使用JSSE的SSL socketfactory来取代默认的socketfactory
-//        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        //使用JSSE的SSL socketfactory来取代默认的socketfactory. 避免出现认证错误
+        props.setProperty("mail.smtp.socketFactory.class",
+				"javax.net.ssl.SSLSocketFactory");
 
         return props;
     }
@@ -121,7 +122,7 @@ public class MailJavaxSessionFactory {
 //		/* 发送信息设置，取自入参 */
 //		mailSenderr.setDefaultEncoding("UTF-8");
 
-    private void _create(EmailConfigureData config) {
+    private void _create(EmailInnerConfigureData config) {
         if(!sessionConcurrentMap.containsKey(config.getUserName())) {
             Properties props = defaultConfig(config);
             // 要连接的SMTP服务器

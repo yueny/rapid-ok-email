@@ -18,7 +18,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class EmailConfigureData extends AbstractMaskBo {
+public class EmailInnerConfigureData extends AbstractMaskBo {
 	/**
 	 * 设置缺省的FROM地址别名
 	 */

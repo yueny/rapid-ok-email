@@ -2,12 +2,14 @@ package com.yueny.rapid.email.sender.internals.tacitly;
 
 import com.google.common.base.Joiner;
 import com.yueny.rapid.email.cluster.RandomLoadBalance;
-import com.yueny.rapid.email.config.EmailConfigureData;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.factory.MailConfigureFactory;
 import com.yueny.rapid.email.factory.MailJavaxSessionFactory;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
 import com.yueny.rapid.email.sender.entity.*;
+import com.yueny.rapid.email.sender.listener.ConsoleEmailSendListener;
+import com.yueny.rapid.lang.util.UuidUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +37,8 @@ import java.util.concurrent.Future;
 @Slf4j
 public class JavaxMailServer extends BaseEmailServer {
     public JavaxMailServer(){
-        //.
+        // 增加控制台输出
+        addListener(new ConsoleEmailSendListener());
     }
 
     @Override
@@ -49,30 +52,33 @@ public class JavaxMailServer extends BaseEmailServer {
     }
 
     @Override
-    public String sendSyn(MessageData emailMessage) throws SendMailException {
-        if (emailMessage.getText() == null && emailMessage.getHtml() == null) {
+    public String sendSyn(MessageData messageData) throws SendMailException {
+        if (messageData.getText() == null && messageData.getHtml() == null) {
             throw new SendMailException("At least one context has to be provided: Text or Html");
         }
 
-        List<MimeBodyPart> attachments = getAttachments(emailMessage);
+        doBefore(messageData);
+
+        List<MimeBodyPart> attachments = getAttachments(messageData);
         MimeMultipart cover;
         boolean       usingAlternative = false;
         boolean       hasAttachments   = attachments.size() > 0;
 
+        String context= "";
         try {
-            if (emailMessage.getText() != null && emailMessage.getHtml() == null) {
+            if (messageData.getText() != null && messageData.getHtml() == null) {
                 // TEXT ONLY
                 cover = new MimeMultipart("mixed");
-                cover.addBodyPart(textPart(emailMessage.getText()));
-            } else if (emailMessage.getText() == null && emailMessage.getHtml() != null) {
+                cover.addBodyPart(textPart(messageData.getText()));
+            } else if (messageData.getText() == null && messageData.getHtml() != null) {
                 // HTML ONLY
                 cover = new MimeMultipart("mixed");
-                cover.addBodyPart(htmlPart(emailMessage.getHtml()));
+                cover.addBodyPart(htmlPart(messageData.getHtml()));
             } else {
                 // HTML + TEXT
                 cover = new MimeMultipart("alternative");
-                cover.addBodyPart(textPart(emailMessage.getText()));
-                cover.addBodyPart(htmlPart(emailMessage.getHtml()));
+                cover.addBodyPart(textPart(messageData.getText()));
+                cover.addBodyPart(htmlPart(messageData.getHtml()));
                 usingAlternative = true;
             }
 
@@ -86,8 +92,8 @@ public class JavaxMailServer extends BaseEmailServer {
                 content.addBodyPart(attachment);
             }
 
-            Map.Entry<EmailConfigureData, MimeMessage> msgMap = getMessage();
-            fillMessageData(msgMap, emailMessage);
+            Map.Entry<EmailInnerConfigureData, MimeMessage> msgMap = getMessage();
+            fillMessageData(msgMap, messageData);
 
             MimeMessage msg = msgMap.getValue();
 
@@ -96,16 +102,19 @@ public class JavaxMailServer extends BaseEmailServer {
             Transport.send(msg);
 
             if(msgMap.getKey().isDebug()){
-                log.debug("邮件发送结束, 发送流程结束.");
+                log.debug("邮件发送操作结束, 发送流程结束.");
             }
+            doAfter(messageData);
+
+            // 返回邮件发送的流水号
+            return UuidUtil.getUUIDForNumber32();
         } catch (SendMailException e) {
+            doAfterThrowable(messageData, e.getCause());
             throw e;
         } catch (Exception e) {
-            log.error("邮件发送异常:", e);
-            throw new SendMailException(e);
+            doAfterThrowable(messageData, e.getCause());
+            throw new SendMailException("邮件发送操作异常:"+e.getMessage());
         }
-
-        return "";
     }
 
     private MimeBodyPart toBodyPart(MimeMultipart cover) throws MessagingException {
@@ -144,7 +153,7 @@ public class JavaxMailServer extends BaseEmailServer {
         return attachments;
     }
 
-    private void fillMessageData(Map.Entry<EmailConfigureData, MimeMessage> messageMap, MessageData data) throws SendMailException {
+    private void fillMessageData(Map.Entry<EmailInnerConfigureData, MimeMessage> messageMap, MessageData data) throws SendMailException {
         MimeMessage message = messageMap.getValue();
         try {
             message.setSubject(data.getSubject(), "UTF-8");
@@ -177,22 +186,7 @@ public class JavaxMailServer extends BaseEmailServer {
         }
     }
 
-    private Map.Entry<EmailConfigureData, MimeMessage> getMessage() throws SendMailException {
-        // 随机选一个有效配置
-        EmailConfigureData data = new RandomLoadBalance().select(MailConfigureFactory.getAll());
-        // 如果未配置, 则直接抛出异常
-        if(data == null){
-            throw new SendMailException("邮箱基本配置异常, 请确认配置信息:"+ data);
-        }
-
-        Session session = MailJavaxSessionFactory.get(data.getUserName());
-
-        MimeMessage msg  = new MimeMessage(session);
-
-        return new AbstractMap.SimpleEntry<EmailConfigureData, MimeMessage>(data, msg);
-    }
-
-    /**
+        /**
      * 批量发送
      * @param msg
      * @param recipients
@@ -246,6 +240,21 @@ public class JavaxMailServer extends BaseEmailServer {
             throw new SendMailException(e);
         }
         return attachmentPart;
+    }
+
+    private Map.Entry<EmailInnerConfigureData, MimeMessage> getMessage() throws SendMailException {
+        // 随机选一个有效配置
+        EmailInnerConfigureData data = new RandomLoadBalance().select(MailConfigureFactory.getAll());
+        // 如果未配置, 则直接抛出异常
+        if(data == null){
+            throw new SendMailException("邮箱基本配置异常, 请确认配置信息:"+ data);
+        }
+
+        Session session = MailJavaxSessionFactory.get(data.getUserName());
+
+        MimeMessage msg  = new MimeMessage(session);
+
+        return new AbstractMap.SimpleEntry<EmailInnerConfigureData, MimeMessage>(data, msg);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.yueny.rapid.email;
 
-import com.yueny.rapid.email.config.EmailConfigureData;
-import com.yueny.rapid.email.config.EmailConstant;
+import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import com.yueny.rapid.email.context.engine.*;
 import com.yueny.rapid.email.encrypt.EncryptedEmailPasswordCallback;
 import com.yueny.rapid.email.exception.SendMailException;
@@ -33,7 +32,7 @@ public class OkEmail implements IOkEmail {
     private static IEngine pebbleEngine = null;
     private static IEngine freemarkEngine = null;
     static {
-        EmailConfigureData ec = init();
+        EmailInnerConfigureData ec = init();
         if(ec != null) {
             MailConfigureFactory.register(ec);
         }
@@ -46,7 +45,7 @@ public class OkEmail implements IOkEmail {
     /**
      * init 邮件配置信息
      */
-    private static EmailConfigureData init() {
+    private static EmailInnerConfigureData init() {
         try {
             @Cleanup
             final InputStreamReader reader = new InputStreamReader(OkEmail.class.getResourceAsStream(xmlPath),
@@ -54,7 +53,7 @@ public class OkEmail implements IOkEmail {
             final XMLEmailConfiguration emailDefaultConfiguration = JAXB.unmarshal(reader, XMLEmailConfiguration.class);
             log.debug("读取到的email配置: {}.", emailDefaultConfiguration);
 
-            EmailConfigureData.EmailConfigureDataBuilder builder = EmailConfigureData.builder()
+            EmailInnerConfigureData.EmailInnerConfigureDataBuilder builder = EmailInnerConfigureData.builder()
                     .alias(emailDefaultConfiguration.getAlias())
                     .from(emailDefaultConfiguration.getFrom())
                     .hostName(emailDefaultConfiguration.getHostName())
@@ -79,7 +78,7 @@ public class OkEmail implements IOkEmail {
                 builder.debug(emailDefaultConfiguration.getConfig().getDebug());
             }
 
-            EmailConfigureData config = builder.build();
+            EmailInnerConfigureData config = builder.build();
             if(config.isDebug()){
                 log.debug("读取到的email配置组装完成: {}.", config);
             }
@@ -141,7 +140,7 @@ public class OkEmail implements IOkEmail {
         if(MailConfigureFactory.exist(username)){
             MailConfigureFactory.refresh(username, pw, mailType.getHostName());
         }else{
-            EmailConfigureData ec = defaultConfig(mailType.getHostName(), username, password, debug);
+            EmailInnerConfigureData ec = defaultConfig(mailType.getHostName(), username, password, debug);
 
             MailConfigureFactory.register(ec);
         }
@@ -184,19 +183,18 @@ public class OkEmail implements IOkEmail {
 //		/* 发送信息设置，取自入参 */
 //		mailSenderr.setDefaultEncoding("UTF-8");
 
-    private static EmailConfigureData defaultConfig(String hostName, String userName, String password, Boolean debug) {
-        return EmailConfigureData.builder()
+    private static EmailInnerConfigureData defaultConfig(String hostName, String userName, String password, Boolean debug) {
+        return EmailInnerConfigureData.builder()
                 .hostName(hostName)
                 .userName(userName)
                 .password(password)
-                .smtpPort(String.valueOf(EmailConstant.SMTP_PORT_465))
-                .ssl(EmailConstant.DEFAULT_USE_SSL)
+                .smtpPort("465")
+                .ssl(true)
                 .printDurationTimer(false)
                 .build();
     }
 
     private MessageData emailMessage;
-//    private List<MimeBodyPart> attachments = new ArrayList<MimeBodyPart>();
 
     /**
      * set email subject
@@ -222,7 +220,7 @@ public class OkEmail implements IOkEmail {
     }
 
     @Override
-    public boolean send() throws SendMailException {
+    public boolean send() {
         ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
         Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
         try{
@@ -239,7 +237,6 @@ public class OkEmail implements IOkEmail {
         } catch(Throwable t) {
             log.error("邮件发送失败!", t);
             // Do nothing
-            t.printStackTrace();
         }
 
         return false;
