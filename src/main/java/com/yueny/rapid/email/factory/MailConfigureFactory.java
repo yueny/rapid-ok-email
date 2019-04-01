@@ -52,17 +52,6 @@ public class MailConfigureFactory {
         return _instants._exist(userName);
     }
 
-    /**
-     * 配置刷新
-     *
-     * @param userName 用户名
-     * @param password 密码
-     * @return 刷新结果, true为刷新成功
-     */
-    public static boolean refresh(String userName, String password, String hostName) {
-        return _instants._refresh(userName, password, hostName);
-    }
-
     public static List<EmailInnerConfigureData> getAll() {
         return _instants._getAll();
     }
@@ -96,33 +85,6 @@ public class MailConfigureFactory {
 
     private boolean _exist(String userName) {
         return emailConfigureDataConcurrentMap.containsKey(userName);
-    }
-
-    private boolean _refresh(String userName, String password, String hostName) {
-        if(_exist(userName)){
-            EmailInnerConfigureData oldConfig = emailConfigureDataConcurrentMap.get(userName);
-
-            EmailInnerConfigureData.EmailConfigureDataBuilder builder = EmailInnerConfigureData.builder()
-                    .alias(oldConfig.getAlias())
-                    .from(oldConfig.getFrom())
-                    .userName(oldConfig.getUserName())
-                    .decrypt(oldConfig.isDecrypt())
-                    .smtpPort(oldConfig.getSmtpPort())
-                    .ssl(oldConfig.isSsl())
-                    .sslPort(oldConfig.getSslPort())
-                    .printDurationTimer(oldConfig.isPrintDurationTimer())
-                    .debug(oldConfig.isDebug())
-                    .hostName(hostName)
-                    .password(password);
-
-            emailConfigureDataConcurrentMap.put(userName, builder.build());
-            oldConfig = null;
-
-            MailJavaxSessionFactory.refresh(userName, password, hostName);
-            return true;
-        }
-
-        return false;
     }
 
     private List<EmailInnerConfigureData> _getAll() {

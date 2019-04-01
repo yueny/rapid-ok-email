@@ -5,7 +5,9 @@ import com.yueny.rapid.email.context.engine.FreemarkEngineImpl;
 import com.yueny.rapid.email.context.engine.JetEngineImpl;
 import com.yueny.rapid.email.context.engine.PebbleEngineImpl;
 import com.yueny.rapid.email.exception.SendMailException;
+import com.yueny.rapid.email.sender.entity.ThreadEmailEntry;
 import com.yueny.rapid.email.util.MailSmtpType;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,12 +17,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 
 /**
  * 发送邮件测试
  *
  */
+@Slf4j
 public class OkEmailTest {
 
     // 该邮箱修改为你需要测试的邮箱地址
@@ -32,13 +36,16 @@ public class OkEmailTest {
     }
 
     @Test
-    public void testSendText() throws SendMailException {
-        OkEmail.subject("这是一封测试TEXT邮件")
+    public void testSendText() throws Exception {
+        Future<ThreadEmailEntry> future = OkEmail.subject("这是一封测试TEXT邮件")
                 .from("小姐姐的邮箱")
                 .to(TO_EMAIL, "deep_blue_yang@126.com")
                 .text("信件内容")
-                .send();
-        Assert.assertTrue(true);
+                .sendFuture();
+
+        Assert.assertTrue(future!=null);
+
+        log.debug("邮件已发送, future:{}!", future.get());
     }
 
     @Test

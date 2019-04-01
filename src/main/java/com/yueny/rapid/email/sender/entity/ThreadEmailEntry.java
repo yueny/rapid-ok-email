@@ -31,6 +31,13 @@ public class ThreadEmailEntry {
 	private final long startTime;
 
 	/**
+	 * 异常信息栈
+	 */
+	@Getter
+	@Setter
+	private Throwable throwable;
+
+	/**
 	 * 创建一个新的entry。
 	 */
 	public ThreadEmailEntry() {

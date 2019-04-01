@@ -8,6 +8,7 @@ import com.yueny.rapid.email.factory.MailConfigureFactory;
 import com.yueny.rapid.email.model.xml.XMLEmailConfiguration;
 import com.yueny.rapid.email.sender.entity.FileMsgAttachmentEntry;
 import com.yueny.rapid.email.sender.entity.MessageData;
+import com.yueny.rapid.email.sender.entity.ThreadEmailEntry;
 import com.yueny.rapid.email.sender.entity.URLMsgAttachmentEntry;
 import com.yueny.rapid.email.sender.internals.tacitly.IEmailServer;
 import com.yueny.rapid.email.util.MailSmtpType;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -137,9 +139,7 @@ public class OkEmail implements IOkEmail {
             pw = EncryptedEmailPasswordCallback.decrypt(password);
         }
 
-        if(MailConfigureFactory.exist(username)){
-            MailConfigureFactory.refresh(username, pw, mailType.getHostName());
-        }else{
+        if(!MailConfigureFactory.exist(username)){
             EmailInnerConfigureData ec = defaultConfig(mailType.getHostName(), username, password, debug);
 
             MailConfigureFactory.register(ec);
@@ -240,6 +240,20 @@ public class OkEmail implements IOkEmail {
         }
 
         return false;
+    }
+
+    @Override
+    public Future<ThreadEmailEntry> sendFuture() {
+        ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
+        Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
+
+        //加载并初始化实现
+        IEmailServer emailServer = driversIterator.next();
+
+        Future<ThreadEmailEntry> future = emailServer.send(emailMessage);
+        log.debug("邮件已发送, future:{}!", future);
+
+        return future;
     }
 
     /**

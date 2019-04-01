@@ -8,7 +8,8 @@ import com.yueny.rapid.email.factory.MailConfigureFactory;
 import com.yueny.rapid.email.factory.MailJavaxSessionFactory;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
 import com.yueny.rapid.email.sender.entity.*;
-import com.yueny.rapid.email.sender.listener.ConsoleEmailSendListener;
+import com.yueny.rapid.lang.thread.AsyncLoadCallable;
+import com.yueny.rapid.lang.thread.AsyncLoadConfig;
 import com.yueny.rapid.lang.util.UuidUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -36,14 +37,31 @@ import java.util.concurrent.Future;
  */
 @Slf4j
 public class JavaxMailServer extends BaseEmailServer {
-    public JavaxMailServer(){
-        // 增加控制台输出
-        addListener(new ConsoleEmailSendListener());
-    }
-
     @Override
-    public Future<ThreadEmailEntry> send(MessageData emailMessage) {
-        return null;
+    public Future<ThreadEmailEntry> send(final MessageData messageData) {
+        final Future<ThreadEmailEntry> future = getExecutor().submit(new AsyncLoadCallable<ThreadEmailEntry>() {
+            @Override
+            public AsyncLoadConfig getConfig() {
+                return new AsyncLoadConfig();
+            }
+
+            @Override
+            public ThreadEmailEntry call() {
+                final ThreadEmailEntry entry = new ThreadEmailEntry();
+
+                try {
+                    final String msgId = sendSyn(messageData);
+                    entry.setMsgId(msgId);
+                    entry.release();
+                } catch (final Exception e) {
+                    entry.setThrowable(e);
+                }
+
+                return entry;
+            }
+        });
+
+        return future;
     }
 
     @Override
