@@ -17,12 +17,11 @@
 package com.yueny.rapid.email.factory;
 
 import com.yueny.rapid.email.config.EmailInnerConfigureData;
+import com.yueny.rapid.email.sender.internals.tacitly.IEmailServer;
+import com.yueny.rapid.email.util.MailMethodType;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -70,8 +69,17 @@ public class MailConfigureFactory {
         if(!emailConfigureDataConcurrentMap.containsKey(config.getUserName())){
             emailConfigureDataConcurrentMap.putIfAbsent(config.getUserName(), config);
 
-            //创建session
-            MailJavaxSessionFactory.create(config);
+            ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
+            Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
+            //加载并初始化实现
+            IEmailServer emailServer = driversIterator.next();
+
+            if(emailServer.getType() == MailMethodType.JAVAX){
+                //创建session
+                JavaxSessionFactory.create(config);
+            }else if(emailServer.getType() == MailMethodType.JAVA_MAIL){
+                JavaxMailSenderFactory.create(config);
+            }
 
             if(config.isDebug()){
                 log.debug("注册新的邮箱服务:{}", config);

@@ -5,9 +5,10 @@ import com.yueny.rapid.email.cluster.RandomLoadBalance;
 import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.factory.MailConfigureFactory;
-import com.yueny.rapid.email.factory.MailJavaxSessionFactory;
+import com.yueny.rapid.email.factory.JavaxSessionFactory;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
 import com.yueny.rapid.email.sender.entity.*;
+import com.yueny.rapid.email.util.MailMethodType;
 import com.yueny.rapid.lang.thread.AsyncLoadCallable;
 import com.yueny.rapid.lang.thread.AsyncLoadConfig;
 import com.yueny.rapid.lang.util.UuidUtil;
@@ -133,6 +134,11 @@ public class JavaxMailServer extends BaseEmailServer {
             doAfterThrowable(messageData, e.getCause());
             throw new SendMailException("邮件发送操作异常:"+e.getMessage());
         }
+    }
+
+    @Override
+    public MailMethodType getType() {
+        return MailMethodType.JAVAX;
     }
 
     private MimeBodyPart toBodyPart(MimeMultipart cover) throws MessagingException {
@@ -268,7 +274,7 @@ public class JavaxMailServer extends BaseEmailServer {
             throw new SendMailException("邮箱基本配置异常, 请确认配置信息:"+ data);
         }
 
-        Session session = MailJavaxSessionFactory.get(data.getUserName());
+        Session session = JavaxSessionFactory.get(data.getUserName());
 
         MimeMessage msg  = new MimeMessage(session);
 

@@ -33,11 +33,18 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
+		<!-- com.yueny.rapid.email.sender.internals.tacitly.JavaxMailServer -->
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+		<!-- com.yueny.rapid.email.sender.internals.tacitly.JavaMailSenderServer -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.mitchellbosecke</groupId>
 			<artifactId>pebble</artifactId>

@@ -29,11 +29,11 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * MailJavaxSessionFactory
+ * JavaxSessionFactory
  */
 @Slf4j
-public class MailJavaxSessionFactory {
-    private static MailJavaxSessionFactory _instants = new MailJavaxSessionFactory();
+public class JavaxSessionFactory {
+    private static JavaxSessionFactory _instants = new JavaxSessionFactory();
 
         /**
      * 添加
@@ -52,7 +52,7 @@ public class MailJavaxSessionFactory {
     private ConcurrentMap<String, Session> sessionConcurrentMap =
             new MapMaker().weakValues().makeMap();
 
-    public MailJavaxSessionFactory() {
+    public JavaxSessionFactory() {
         //.
     }
 

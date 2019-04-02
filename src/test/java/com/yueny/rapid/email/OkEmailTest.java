@@ -126,7 +126,7 @@ public class OkEmailTest {
                 .from("小姐姐的邮箱")
                 .to(TO_EMAIL, "deep_blue_yang@126.com")
                 .bcc(TO_EMAIL)
-                .html(engine.render("/register.jetx", context))
+                .html(EngineType.JET, "/register.jetx", context)
                 .send();
         Assert.assertTrue(true);
     }

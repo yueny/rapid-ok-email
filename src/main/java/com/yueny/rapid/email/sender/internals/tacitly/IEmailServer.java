@@ -7,6 +7,7 @@ import com.yueny.rapid.email.exception.SendMailException;
 import com.yueny.rapid.email.sender.call.IEmailSendCallback;
 import com.yueny.rapid.email.sender.entity.MessageData;
 import com.yueny.rapid.email.sender.entity.ThreadEmailEntry;
+import com.yueny.rapid.email.util.MailMethodType;
 
 import java.util.concurrent.Future;
 
@@ -50,4 +51,5 @@ public interface IEmailServer {
 	 */
 	String sendSyn(final MessageData emailMessage) throws SendMailException;
 
+	MailMethodType getType();
 }

@@ -223,16 +223,13 @@ public class OkEmail implements IOkEmail {
     public boolean send() {
         ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
         Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
+        //加载并初始化实现
+        IEmailServer emailServer = driversIterator.next();
+
         try{
-            //查找具体的实现类的全限定名称
-            while(driversIterator.hasNext()) {
-                //加载并初始化实现
-                IEmailServer emailServer = driversIterator.next();
+            String msgId = emailServer.sendSyn(emailMessage);
 
-                String msgId = emailServer.sendSyn(emailMessage);
-
-                log.debug("邮件发送成功, msgId:{}!", msgId);
-            }
+            log.debug("邮件发送成功, msgId:{}!", msgId);
             return true;
         } catch(Throwable t) {
             log.error("邮件发送失败!", t);

@@ -6,7 +6,7 @@ package com.yueny.rapid.email.util;
 import lombok.Getter;
 
 /**
- * 邮件类型枚举类.
+ * 邮件smtp类型枚举类.
  * "mail.smtp.host"
  *
  * <ul>

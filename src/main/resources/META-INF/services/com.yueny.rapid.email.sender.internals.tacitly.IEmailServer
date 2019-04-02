@@ -1,1 +1,2 @@
-com.yueny.rapid.email.sender.internals.tacitly.JavaxMailServer
+#com.yueny.rapid.email.sender.internals.tacitly.JavaxMailServer
+com.yueny.rapid.email.sender.internals.tacitly.JavaMailSenderServer
