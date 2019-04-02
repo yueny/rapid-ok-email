@@ -22,13 +22,14 @@ import java.util.Map;
  */
 abstract class BaseEmailServer implements IEmailServer {
     @Getter
-    private final AsyncLoadExecutors executor = new AsyncLoadExecutors(2);
+    private static final AsyncLoadExecutors executor = new AsyncLoadExecutors(2);
+    static{
+        // final Properties properties = SysConfig.getConfiguration();
+        executor.initital();
+    }
 
     public BaseEmailServer(){
         this.initital();
-
-        // final Properties properties = SysConfig.getConfiguration();
-        executor.initital();
     }
 
     protected void initital() {
@@ -69,7 +70,5 @@ abstract class BaseEmailServer implements IEmailServer {
             emailSendListener.before(messageData);
         }
     }
-
-
 
 }
