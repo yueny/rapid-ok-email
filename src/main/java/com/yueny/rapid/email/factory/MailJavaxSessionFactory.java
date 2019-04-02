@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import java.security.Security;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
@@ -55,8 +56,18 @@ public class MailJavaxSessionFactory {
         //.
     }
 
-    private static Properties defaultConfig(EmailInnerConfigureData config) {
+    private static Properties getConfig(EmailInnerConfigureData config) {
+        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+
         Properties props = new Properties();
+        // 要连接的SMTP服务器
+        props.setProperty("mail.smtp.host", config.getHostName());
+        //使用JSSE的SSL socketfactory来取代默认的socketfactory. 避免出现认证错误
+        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.setProperty("mail.smtp.socketFactory.fallback", "false");
+        // 要连接的SMTP服务器的端口号
+        props.setProperty("mail.smtp.port", config.getSmtpPort());
+        props.setProperty("mail.smtp.socketFactory.port", config.getSslPort());
 
         // 需要身份验证. 缺省是false，如果为true，尝试使用AUTH命令认证用户。
 //        props.put("mail.smtp.localhost", "127.0.0.1");
@@ -71,16 +82,6 @@ public class MailJavaxSessionFactory {
         props.put("mail.smtp.connectiontimeout", String.valueOf(EmailConstant.DEFAULT_SMTP_TIMEOUT));
         // Socket I/O超时值，单位毫秒，缺省值不超时
         props.put("mail.smtp.timeout", String.valueOf(EmailConstant.DEFAULT_SMTP_TIMEOUT));
-
-//        props.put("mail.smtp.socketFactory.fallback", "false");
-
-        // 要连接的SMTP服务器的端口号
-        props.put("mail.smtp.port", config.getSmtpPort());
-        props.put("mail.smtp.socketFactory.port", config.getSslPort());
-
-        //使用JSSE的SSL socketfactory来取代默认的socketfactory. 避免出现认证错误
-        props.put("mail.smtp.socketFactory.class",
-				"javax.net.ssl.SSLSocketFactory");
 
         return props;
     }
@@ -123,12 +124,7 @@ public class MailJavaxSessionFactory {
 
     private void _create(EmailInnerConfigureData config) {
         if(!sessionConcurrentMap.containsKey(config.getUserName())) {
-            Properties props = defaultConfig(config);
-            // 要连接的SMTP服务器
-            props.put("mail.smtp.host", config.getHostName());
-
-            props.setProperty("username", config.getUserName());
-            props.setProperty("password", config.getPassword());
+            Properties props = getConfig(config);
 
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override

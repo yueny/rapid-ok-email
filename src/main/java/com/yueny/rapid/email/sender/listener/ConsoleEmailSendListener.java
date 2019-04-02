@@ -17,12 +17,12 @@ public class ConsoleEmailSendListener implements IEmailSendListener {
 
 	@Override
 	public void after(MessageData messageData) {
-		log.info("控制台输出log. 邮件 「{}」发送完成。", messageData.getSubject());
+		log.info("控制台输出log. 邮件主题 「{}」发送完成。", messageData.getSubject());
 	}
 
 	@Override
 	public void afterThrowable(final MessageData messageData,  Throwable throwable) {
-		log.error("控制台输出log. 发送操作异常, afterThrowable: ", throwable);
+		log.error("控制台输出log. . 邮件主题 「" + messageData.getSubject() + "」发送操作异常, afterThrowable: ", throwable);
 	}
 
 	@Override
