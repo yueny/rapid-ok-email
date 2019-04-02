@@ -189,8 +189,10 @@ public class OkEmail implements IOkEmail {
                 .userName(userName)
                 .password(password)
                 .smtpPort("465")
+                .sslPort("465")
                 .ssl(true)
                 .printDurationTimer(false)
+                .debug(false)
                 .build();
     }
 
