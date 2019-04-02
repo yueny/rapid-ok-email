@@ -22,6 +22,7 @@ import com.yueny.rapid.email.config.EmailInnerConfigureData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -45,7 +46,8 @@ public class JavaxMailSenderFactory {
     }
 
     private ConcurrentMap<String, JavaMailSenderImpl> senderConcurrentMap =
-            new MapMaker().weakValues().makeMap();
+            new ConcurrentHashMap<>();
+//            new MapMaker().weakValues().makeMap();
 
     public JavaxMailSenderFactory() {
         //.

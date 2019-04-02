@@ -26,6 +26,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import java.security.Security;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -50,7 +51,8 @@ public class JavaxSessionFactory {
 
 //    private Table<String, Session, Session> tables = HashBasedTable.create();
     private ConcurrentMap<String, Session> sessionConcurrentMap =
-            new MapMaker().weakValues().makeMap();
+        new ConcurrentHashMap<>();
+//            new MapMaker().weakValues().makeMap();
 
     public JavaxSessionFactory() {
         //.
