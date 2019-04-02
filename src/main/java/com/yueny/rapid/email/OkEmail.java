@@ -87,7 +87,7 @@ public class OkEmail implements IOkEmail {
 
             return config;
         } catch (final Exception e) {
-            log.error("加载配置异常，默认配置置为空！", e);
+            log.error("加载配置异常，默认配置置为空, 不影响功能性.！", e);
         } finally {
             // IOUtils.closeQuietly(reader);
         }
