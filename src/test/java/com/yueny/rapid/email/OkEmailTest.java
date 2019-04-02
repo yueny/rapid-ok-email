@@ -43,9 +43,8 @@ public class OkEmailTest {
                 .text("信件内容")
                 .sendFuture();
 
-        Assert.assertTrue(future!=null);
-
         log.debug("邮件已发送, future:{}!", future.get());
+        Assert.assertTrue(future!=null && future.get().isSucess());
     }
 
     @Test
