@@ -61,14 +61,12 @@ public class JavaxMailSenderFactory {
         // 设置SMTP端口
         mailSender.setPort(Integer.valueOf(config.getSmtpPort()));
 
-        // Default is "smtp".
-        // mailSender.setProtocol(protocol);
-        // 要装入session的协议（smtp、pop3、imap、nntp）
-//        props.put("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
-
         // 设置认证信息
         mailSender.setUsername(config.getUserName());
         mailSender.setPassword(config.getPassword());
+
+        // 要装入session的协议（smtp、pop3、imap、nntp）
+        mailSender.getJavaMailProperties().setProperty("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
 
         // 设置SMTP端口
         mailSender.getJavaMailProperties().setProperty("mail.smtp.port", config.getSmtpPort());
@@ -82,7 +80,7 @@ public class JavaxMailSenderFactory {
                 "javax.net.ssl.SSLSocketFactory");
 
         // 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-        mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", String.valueOf(config.isSsl()));
+        mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "false");
         //设置调试模式可以在控制台查看发送过程
         mailSender.getJavaMailProperties().setProperty("mail.debug", String.valueOf(config.isDebug()));
         // Socket I/O超时值，单位毫秒，缺省值不超时
