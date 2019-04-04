@@ -18,7 +18,7 @@ public class EmailConstant {
 	/**
 	 * 默认协议, 默认 smtp. 协议（smtp、pop3、imap、nntp）
 	 */
-	public static final String DEFAULT_TRANSPORT_PROTOCOL = "smtps";
+	public static final String DEFAULT_TRANSPORT_PROTOCOL = "smtp";
 	/**
 	 * 默认超时时间
 	 */

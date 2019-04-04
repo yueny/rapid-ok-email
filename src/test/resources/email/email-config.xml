@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="gb2312"?>
 <email>
 	<!--
-	<transport-protocol>smtps</transport-protocol>
+	<transport-protocol>smtp</transport-protocol>
 	-->
 
     <!-- 设置缺省的FROM地址-->
