@@ -56,6 +56,7 @@ public class OkEmail implements IOkEmail {
             log.debug("读取到的email配置: {}.", emailDefaultConfiguration);
 
             EmailInnerConfigureData.EmailInnerConfigureDataBuilder builder = EmailInnerConfigureData.builder()
+                    .transportProtocol(emailDefaultConfiguration.getTransportProtocol())
                     .alias(emailDefaultConfiguration.getAlias())
                     .from(emailDefaultConfiguration.getFrom())
                     .hostName(emailDefaultConfiguration.getHostName())
@@ -145,43 +146,6 @@ public class OkEmail implements IOkEmail {
             MailConfigureFactory.register(ec);
         }
     }
-
-
-    //		/* 认证信息设置，取自配置 */
-//		// 设置SMTP服务器名称
-//		mailSender.setHost(getEmailConfigure().getHostName());
-//		// 设置SMTP端口
-//		mailSender.setPort(Integer.valueOf(getEmailConfigure().getSmtpPort()));
-//
-//		// Default is "smtp".
-//		// mailSender.setProtocol(protocol);
-//
-//		// 设置认证信息
-//		mailSender.setUsername(getEmailConfigure().getUserName());
-//        mailSender.setPassword(getEmailConfigure().getPassword());
-//
-//		// Properties properties = new Properties();
-//		// //启用调试
-//		// properties.setProperty("mail.debug", "true");
-//		//// 设置链接超时
-//		// properties.setProperty("mail.smtp.timeout", "1000");
-//
-//		// 设置SMTP端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.port", getEmailConfigure().getSmtpPort());
-//		// 开启认证 /设置是否使用SSL
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(getEmailConfigure().isSsl()));
-//		// 设置SSL端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", getEmailConfigure().getSslPort());
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
-//		// 避免出现认证错误
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
-//				"javax.net.ssl.SSLSocketFactory");
-//
-//		// 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "true");
-//
-//		/* 发送信息设置，取自入参 */
-//		mailSenderr.setDefaultEncoding("UTF-8");
 
     private static EmailInnerConfigureData defaultConfig(String hostName, String userName, String password, Boolean debug) {
         return EmailInnerConfigureData.builder()

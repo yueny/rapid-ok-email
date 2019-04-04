@@ -54,7 +54,7 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	/**
 	 * 设置是否使用SSL
 	 */
-	private boolean ssl = false;
+	private boolean ssl = EmailConstant.DEFAULT_SMTP_AUTH;
 	/**
 	 * 设置SSL端口
 	 */
@@ -72,4 +72,10 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	 * 是否开启调试模式
 	 */
 	private boolean debug = false;
+
+	/**
+	 * transport.protocol
+	 */
+	private String transportProtocol = EmailConstant.DEFAULT_TRANSPORT_PROTOCOL;
+
 }

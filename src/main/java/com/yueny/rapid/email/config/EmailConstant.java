@@ -16,7 +16,7 @@ public class EmailConstant {
 	public static final boolean DEFAULT_SMTP_AUTH = true;
 
 	/**
-	 * 默认协议, 默认 smtp
+	 * 默认协议, 默认 smtp. 协议（smtp、pop3、imap、nntp）
 	 */
 	public static final String DEFAULT_TRANSPORT_PROTOCOL = "smtps";
 	/**

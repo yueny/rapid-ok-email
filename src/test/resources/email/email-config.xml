@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="gb2312"?>
 <email>
+	<!--
+	<transport-protocol>smtps</transport-protocol>
+	-->
+
     <!-- 设置缺省的FROM地址-->
 	<from>deep_blue_yang@126.com</from>
     <!-- 设置缺省的FROM地址别名-->

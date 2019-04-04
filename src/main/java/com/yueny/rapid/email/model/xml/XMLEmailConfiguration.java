@@ -3,6 +3,7 @@
  */
 package com.yueny.rapid.email.model.xml;
 
+import com.yueny.rapid.email.config.EmailConstant;
 import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -49,6 +50,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 public class XMLEmailConfiguration {
 	/**
+	 * transport.protocol
+	 */
+	@XmlElement(name = "transport-protocol", required = false)
+	private String transportProtocol = EmailConstant.DEFAULT_TRANSPORT_PROTOCOL;
+
+	/**
 	 * 设置缺省的FROM地址别名
 	 */
 	@XmlElement(name = "alias")
@@ -93,6 +100,5 @@ public class XMLEmailConfiguration {
 	 */
 	@XmlElement(name = "config", required = false)
 	private XMLEmailConfig config;
-
 
 }

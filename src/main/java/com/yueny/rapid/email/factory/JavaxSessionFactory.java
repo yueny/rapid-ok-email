@@ -62,6 +62,8 @@ public class JavaxSessionFactory {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
         Properties props = new Properties();
+        props.setProperty("mail.transport.protocol", config.getTransportProtocol());
+
         // 要连接的SMTP服务器
         props.setProperty("mail.smtp.host", config.getHostName());
         //使用JSSE的SSL socketfactory来取代默认的socketfactory. 避免出现认证错误
@@ -73,10 +75,9 @@ public class JavaxSessionFactory {
 
         // 需要身份验证. 缺省是false，如果为true，尝试使用AUTH命令认证用户。
 //        props.put("mail.smtp.localhost", "127.0.0.1");
-        props.put("mail.smtp.auth", String.valueOf(EmailConstant.DEFAULT_SMTP_AUTH));
+        props.put("mail.smtp.auth", String.valueOf(config.isSsl()));
         props.put("mail.smtp.ssl.enable", String.valueOf(config.isSsl()));
-        // 要装入session的协议（smtp、pop3、imap、nntp）
-        props.put("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
+
         //设置调试模式可以在控制台查看发送过程
         props.put("mail.debug", config.isDebug());
 
@@ -87,42 +88,6 @@ public class JavaxSessionFactory {
 
         return props;
     }
-
-    //		/* 认证信息设置，取自配置 */
-//		// 设置SMTP服务器名称
-//		mailSender.setHost(getEmailConfigure().getHostName());
-//		// 设置SMTP端口
-//		mailSender.setPort(Integer.valueOf(getEmailConfigure().getSmtpPort()));
-//
-//		// Default is "smtp".
-//		// mailSender.setProtocol(protocol);
-//
-//		// 设置认证信息
-//		mailSender.setUsername(getEmailConfigure().getUserName());
-//        mailSender.setPassword(getEmailConfigure().getPassword());
-//
-//		// Properties properties = new Properties();
-//		// //启用调试
-//		// properties.setProperty("mail.debug", "true");
-//		//// 设置链接超时
-//		// properties.setProperty("mail.smtp.timeout", "1000");
-//
-//		// 设置SMTP端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.port", getEmailConfigure().getSmtpPort());
-//		// 开启认证 /设置是否使用SSL
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(getEmailConfigure().isSsl()));
-//		// 设置SSL端口
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", getEmailConfigure().getSslPort());
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
-//		// 避免出现认证错误
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
-//				"javax.net.ssl.SSLSocketFactory");
-//
-//		// 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-//		mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "true");
-//
-//		/* 发送信息设置，取自入参 */
-//		mailSenderr.setDefaultEncoding("UTF-8");
 
     private void _create(EmailInnerConfigureData config) {
         if(!sessionConcurrentMap.containsKey(config.getUserName())) {

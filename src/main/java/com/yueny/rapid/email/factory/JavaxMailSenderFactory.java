@@ -19,9 +19,11 @@ package com.yueny.rapid.email.factory;
 import com.google.common.collect.MapMaker;
 import com.yueny.rapid.email.config.EmailConstant;
 import com.yueny.rapid.email.config.EmailInnerConfigureData;
+import com.yueny.rapid.email.util.MailSmtpType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -60,18 +62,14 @@ public class JavaxMailSenderFactory {
         mailSender.setHost(config.getHostName());
         // 设置SMTP端口
         mailSender.setPort(Integer.valueOf(config.getSmtpPort()));
+        mailSender.setProtocol(config.getTransportProtocol());
 
         // 设置认证信息
         mailSender.setUsername(config.getUserName());
         mailSender.setPassword(config.getPassword());
 
-        // 要装入session的协议（smtp、pop3、imap、nntp）
-        mailSender.getJavaMailProperties().setProperty("mail.transport.protocol", EmailConstant.DEFAULT_TRANSPORT_PROTOCOL);
-
         // 设置SMTP端口
         mailSender.getJavaMailProperties().setProperty("mail.smtp.port", config.getSmtpPort());
-        // 开启认证 /设置是否使用SSL
-        mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(config.isSsl()));
         // 设置SSL端口
         mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.port", config.getSslPort());
         mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.fallback", "false");
@@ -79,8 +77,16 @@ public class JavaxMailSenderFactory {
         mailSender.getJavaMailProperties().setProperty("mail.smtp.socketFactory.class",
                 "javax.net.ssl.SSLSocketFactory");
 
+        // 开启认证 /设置是否使用SSL
+        mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(config.isSsl()));
+
         // 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-        mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "false");
+        if(Arrays.asList(MailSmtpType._126.getHostName(), MailSmtpType._163.getHostName()).contains(config.getHostName())){
+            mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "false");
+        }else{
+            mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", String.valueOf(config.isSsl()));
+        }
+
         //设置调试模式可以在控制台查看发送过程
         mailSender.getJavaMailProperties().setProperty("mail.debug", String.valueOf(config.isDebug()));
         // Socket I/O超时值，单位毫秒，缺省值不超时
