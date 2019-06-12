@@ -28,11 +28,11 @@ import java.util.concurrent.Future;
 public class OkEmailTest {
 
     // 该邮箱修改为你需要测试的邮箱地址
-    private static final String TO_EMAIL = "yuany@.com";
+    private static final String TO_EMAIL = "deep_blue_yang@126.com";
 
     @Before
     public void before() {
-        OkEmail.config(MailSmtpType._126, "deep_blue_yang@126.com", "21C738B2A8FCB58AEB50F272125A4EC0", true);
+        //OkEmail.config(MailSmtpType._126, "deep_blue_yang@126.com", "", true);
     }
 
     @Test

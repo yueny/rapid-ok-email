@@ -62,18 +62,14 @@ public class OkEmail implements IOkEmail {
                     .hostName(emailDefaultConfiguration.getHostName())
                     .userName(emailDefaultConfiguration.getAuth().getUserName())
                     .decrypt(emailDefaultConfiguration.getAuth().getDecrypt())
+                    .pwPBESalt(emailDefaultConfiguration.getAuth().getPwPBESalt())
                     .smtpPort(emailDefaultConfiguration.getSmtpPort())
                     .ssl(emailDefaultConfiguration.getSsl())
                     .sslPort(emailDefaultConfiguration.getSslPort());
 
-            if (emailDefaultConfiguration.getAuth().getDecrypt()) {
-                final String dePasswd = emailDefaultConfiguration.getAuth().getPassword();
-                // 密码解密
-                final String pas = EncryptedEmailPasswordCallback.decrypt(dePasswd);
-                builder.password(pas);
-            }else{
-                builder.password(emailDefaultConfiguration.getAuth().getPassword());
-            }
+            builder.password(getPassword(emailDefaultConfiguration.getAuth().getPassword(),
+                    emailDefaultConfiguration.getAuth().getDecrypt(),
+                    emailDefaultConfiguration.getAuth().getPwPBESalt()));
 
             // config
             if (emailDefaultConfiguration.getConfig() != null) {
@@ -135,13 +131,10 @@ public class OkEmail implements IOkEmail {
      * @param debug 是否debug模式
      */
     public static void config(MailSmtpType mailType, final String username, final String password, boolean isEncrypt, boolean debug) {
-        String pw = password;
-        if(isEncrypt){
-            pw = EncryptedEmailPasswordCallback.decrypt(password);
-        }
+        String pw = getPassword(password, isEncrypt, "");
 
         if(!MailConfigureFactory.exist(username)){
-            EmailInnerConfigureData ec = defaultConfig(mailType.getHostName(), username, password, debug);
+            EmailInnerConfigureData ec = defaultConfig(mailType.getHostName(), username, pw, debug);
 
             MailConfigureFactory.register(ec);
         }
@@ -158,6 +151,18 @@ public class OkEmail implements IOkEmail {
                 .printDurationTimer(false)
                 .debug(false)
                 .build();
+    }
+
+    private static String getPassword(String password, boolean decrypt, String pwPBESalt) {
+        if (decrypt) {
+            // 密码解密
+            if(StringUtils.isNotEmpty(pwPBESalt)){ // 二次加密
+                return EncryptedEmailPasswordCallback.decrypt(password, pwPBESalt);
+            }
+            return EncryptedEmailPasswordCallback.decrypt(password);
+        }else{
+            return password;
+        }
     }
 
     private MessageData emailMessage;

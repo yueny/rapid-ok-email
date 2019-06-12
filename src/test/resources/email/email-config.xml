@@ -18,11 +18,11 @@
 	<ssl-port>465</ssl-port>
 
 	<!-- 认证用户 -->
-	<auth decrypt="true">
+	<auth decrypt="true" pw-ps="e3194b6b10a8e5a0">
 		<!-- 认证用户名 -->
 		<user-name>deep_blue_yang@126.com</user-name>
 		<!-- 认证用户密码 new  -->
-		<password>21C738B2A8FCB58AEB50F272125A4EC0</password>
+		<password>a668cbc1e9f66ff061f6fde864dfa7fc6d2dcad1a19d372733bf6e631a39c6c368368957381ca0fe</password>
 	</auth>
 	
 	<!-- 配置项 -->

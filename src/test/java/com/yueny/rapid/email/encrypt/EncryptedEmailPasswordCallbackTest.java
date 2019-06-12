@@ -27,4 +27,19 @@ public class EncryptedEmailPasswordCallbackTest {
 		Assert.assertEquals(passwd, data);
 	}
 
+	@Test
+	public void test1() {
+		final String passwd = "aaaaa";
+		String pwPBESalt = EncryptedEmailPasswordCallback.getSalt();
+		System.out.println("加密前的数据:" + passwd + ", 盐：" + pwPBESalt);
+
+		final String s = EncryptedEmailPasswordCallback.encrypt(passwd, pwPBESalt);
+		System.out.println("加密后的密文:" + s);
+
+		final String data = EncryptedEmailPasswordCallback.decrypt(s, pwPBESalt);
+		System.out.println("解密后的字符串:" + data);
+
+		Assert.assertEquals(passwd, data);
+	}
+
 }

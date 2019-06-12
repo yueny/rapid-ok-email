@@ -28,6 +28,12 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	 * 设置密码是否加密，默认不加密
 	 */
 	private boolean decrypt = false;
+	/**
+	 * password 字段额外加密，默认空。
+	 * 该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作
+	 * 值为 PBE加密的盐
+	 */
+	private String pwPBESalt;
 
 	/**
 	 * 发件地址
