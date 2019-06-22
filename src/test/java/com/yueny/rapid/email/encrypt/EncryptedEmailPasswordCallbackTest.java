@@ -31,6 +31,7 @@ public class EncryptedEmailPasswordCallbackTest {
 	public void test1() {
 		final String passwd = "aaaaa";
 		String pwPBESalt = EncryptedEmailPasswordCallback.getSalt();
+//		String pwPBESalt = "aaa";
 		System.out.println("加密前的数据:" + passwd + ", 盐：" + pwPBESalt);
 
 		final String s = EncryptedEmailPasswordCallback.encrypt(passwd, pwPBESalt);
