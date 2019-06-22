@@ -3,6 +3,7 @@
  */
 package com.yueny.rapid.email.config;
 
+import com.yueny.rapid.email.util.MailSmtpType;
 import com.yueny.rapid.lang.mask.annotation.Mask;
 import com.yueny.rapid.lang.mask.pojo.instance.AbstractMaskBo;
 import lombok.Builder;
@@ -35,14 +36,18 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	 */
 	private String pwPBESalt;
 
+//	/**
+//	 * 发件地址
+//	 */
+//	private String from;
+//	/**
+//	 * 设置SMTP服务器名称
+//	 */
+//	private String hostName;
 	/**
-	 * 发件地址
+	 * MailSmtpType， 取值范围来自 MailSmtpType(_126,_163,_ALIYUN,_QQ,_QQ_ENT)
 	 */
-	private String from;
-	/**
-	 * 设置SMTP服务器名称
-	 */
-	private String hostName;
+	private MailSmtpType smtpType;
 	/**
 	 * 是否同步发送
 	 */

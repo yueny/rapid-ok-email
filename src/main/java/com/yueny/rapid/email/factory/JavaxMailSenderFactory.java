@@ -59,7 +59,7 @@ public class JavaxMailSenderFactory {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         // 要连接的SMTP服务器
-        mailSender.setHost(config.getHostName());
+        mailSender.setHost(config.getSmtpType().getSmtpName());
         // 设置SMTP端口
         mailSender.setPort(Integer.valueOf(config.getSmtpPort()));
         mailSender.setProtocol(config.getTransportProtocol());
@@ -81,7 +81,7 @@ public class JavaxMailSenderFactory {
         mailSender.getJavaMailProperties().setProperty("mail.smtp.auth", String.valueOf(config.isSsl()));
 
         // 如果是网易邮箱， mail.smtp.starttls.enable 设置为 false
-        if(Arrays.asList(MailSmtpType._126.getHostName(), MailSmtpType._163.getHostName()).contains(config.getHostName())){
+        if(Arrays.asList(MailSmtpType._126.getSmtpName(), MailSmtpType._163.getSmtpName()).contains(config.getSmtpType().getSmtpName())){
             mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", "false");
         }else{
             mailSender.getJavaMailProperties().setProperty("mail.smtp.starttls.enable", String.valueOf(config.isSsl()));

@@ -65,7 +65,7 @@ public class JavaxSessionFactory {
         props.setProperty("mail.transport.protocol", config.getTransportProtocol());
 
         // 要连接的SMTP服务器
-        props.setProperty("mail.smtp.host", config.getHostName());
+        props.setProperty("mail.smtp.host", config.getSmtpType().getSmtpName());
         //使用JSSE的SSL socketfactory来取代默认的socketfactory. 避免出现认证错误
         props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.setProperty("mail.smtp.socketFactory.fallback", "false");

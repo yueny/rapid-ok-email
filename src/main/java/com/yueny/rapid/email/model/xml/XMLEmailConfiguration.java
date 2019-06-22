@@ -60,34 +60,44 @@ public class XMLEmailConfiguration {
 	 */
 	@XmlElement(name = "alias")
 	private String alias;
+//
+//	/**
+//	 * 设置缺省的FROM地址
+//	 */
+//	@XmlElement(name = "from")
+//	private String from;
 
-	/**
-	 * 设置缺省的FROM地址
-	 */
-	@XmlElement(name = "from")
-	private String from;
-	/**
-	 * 设置SMTP服务器名称
-	 */
-	@XmlElement(name = "host-name", required = true)
-	private String hostName;
+//	/**
+//	 * 设置SMTP服务器名称
+//	 */
+//	@XmlElement(name = "host-name", required = true)
+//	private String hostName;
+
 	/**
 	 * 设置SMTP端口
 	 * "mail.smtp.port"
 	 */
 	@XmlElement(name = "smtp-port")
-	private String smtpPort;
+	private String smtpPort = "465";
+
 	/**
 	 * 设置是否使用SSL，默认false.
 	 * "mail.smtp.ssl.enable"
 	 */
 	@XmlElement(name = "ssl")
-	private Boolean ssl = false;
+	private Boolean ssl = true;
+
 	/**
 	 * 设置SSL端口
-	 */
 	@XmlElement(name = "ssl-port")
-	private String sslPort;
+	 */
+	private String sslPort = "465";
+
+	/**
+	 * MailSmtpType， 取值范围来自 MailSmtpType(_126,_163,_ALIYUN,_QQ,_QQ_ENT)
+	 */
+	@XmlElement(name = "smtp-type", required = true)
+	private String smtpType;
 
 	/**
 	 * 认证用户信息

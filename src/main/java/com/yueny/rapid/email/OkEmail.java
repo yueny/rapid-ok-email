@@ -30,13 +30,20 @@ import java.util.concurrent.Future;
 public class OkEmail implements IOkEmail {
     private static String xmlPath = "/email/email-config.xml";
 
+    /**
+     * 是否加载xml配置文件。 默认true, 加载
+     */
+    private static boolean isLoadXmlConfig = true;
+
     private static IEngine jetEngine = null;
     private static IEngine pebbleEngine = null;
     private static IEngine freemarkEngine = null;
     static {
-        EmailInnerConfigureData ec = init();
-        if(ec != null) {
-            MailConfigureFactory.register(ec);
+        if(isLoadXmlConfig){
+            EmailInnerConfigureData ec = init();
+            if(ec != null) {
+                MailConfigureFactory.register(ec);
+            }
         }
 
         jetEngine = new JetEngineImpl();
@@ -55,11 +62,12 @@ public class OkEmail implements IOkEmail {
             final XMLEmailConfiguration emailDefaultConfiguration = JAXB.unmarshal(reader, XMLEmailConfiguration.class);
             log.debug("读取到的email配置: {}.", emailDefaultConfiguration);
 
+            MailSmtpType smtpType = MailSmtpType.getBy(emailDefaultConfiguration.getSmtpType());
+
             EmailInnerConfigureData.EmailInnerConfigureDataBuilder builder = EmailInnerConfigureData.builder()
                     .transportProtocol(emailDefaultConfiguration.getTransportProtocol())
                     .alias(emailDefaultConfiguration.getAlias())
-                    .from(emailDefaultConfiguration.getFrom())
-                    .hostName(emailDefaultConfiguration.getHostName())
+                    .smtpType(smtpType)
                     .userName(emailDefaultConfiguration.getAuth().getUserName())
                     .decrypt(emailDefaultConfiguration.getAuth().getDecrypt())
                     .pwPBESalt(emailDefaultConfiguration.getAuth().getPwPBESalt())
@@ -116,9 +124,27 @@ public class OkEmail implements IOkEmail {
      * @param password email auth password 密码
      * @param isEncrypt 是否已加密
      */
-    public static void config(MailSmtpType mailType, final String username, final String password, boolean isEncrypt) {
-        config(mailType, username, password, isEncrypt, false);
+    public static void config(MailSmtpType mailType, final String username, final String password,
+                              boolean isEncrypt) {
+        config(mailType, username, password, isEncrypt, "");
     }
+
+    /**
+     * 即使存在, 也进行邮箱初始化配置.
+     * only config username and password.
+     *
+     * config(MailSmtpType._126, "deep_blue_yang@126.com", "sdfasfdsfgsfas", true);
+     *
+     * @param username email auth username
+     * @param password email auth password 密码
+     * @param isEncrypt 是否已加密
+     * @param pwPBESalt password 字段额外加密，默认空
+     */
+    public static void config(MailSmtpType mailType, final String username, final String password,
+                              boolean isEncrypt, String pwPBESalt) {
+        config(mailType, username, password, isEncrypt, pwPBESalt, false);
+    }
+
     /**
      * 即使存在, 也进行邮箱初始化配置.
      * only config username and password.
@@ -128,25 +154,27 @@ public class OkEmail implements IOkEmail {
      * @param username email auth username
      * @param password email auth password 密码
      * @param isEncrypt 是否已加密
+     * @param pwPBESalt password 字段额外加密，默认空
      * @param debug 是否debug模式
      */
-    public static void config(MailSmtpType mailType, final String username, final String password, boolean isEncrypt, boolean debug) {
-        String pw = getPassword(password, isEncrypt, "");
+    public static void config(MailSmtpType mailType, final String username,
+                              final String password, boolean isEncrypt, String pwPBESalt, boolean debug) {
+        String pw = getPassword(password, isEncrypt, pwPBESalt);
 
         if(!MailConfigureFactory.exist(username)){
-            EmailInnerConfigureData ec = defaultConfig(mailType.getHostName(), username, pw, debug);
+            EmailInnerConfigureData ec = defaultConfig(mailType, username, pw, debug);
 
             MailConfigureFactory.register(ec);
         }
     }
 
-    private static EmailInnerConfigureData defaultConfig(String hostName, String userName, String password, Boolean debug) {
+    private static EmailInnerConfigureData defaultConfig(MailSmtpType smtpType, String userName, String password, Boolean debug) {
         return EmailInnerConfigureData.builder()
-                .hostName(hostName)
+                .smtpType(smtpType)
                 .userName(userName)
                 .password(password)
-                .smtpPort("465")
-                .sslPort("465")
+                .smtpPort(smtpType.getSmtpSSLPort())
+                .sslPort(smtpType.getSmtpSSLPort())
                 .ssl(true)
                 .printDurationTimer(false)
                 .debug(false)
