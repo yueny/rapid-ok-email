@@ -94,5 +94,5 @@ Future<ThreadEmailEntry> future = OkEmail
 * 增加密码密文配置功能。
 * 增加盐值配置
 
-##### 1.1.0-SNAPSHOT
+##### 1.1.0-SNAPSHOT/1.1.0
 * 补充邮件发送的非必填参数的配置化
