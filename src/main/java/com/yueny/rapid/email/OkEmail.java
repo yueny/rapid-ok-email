@@ -15,6 +15,7 @@ import com.yueny.rapid.email.util.MailSmtpType;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 import javax.xml.bind.JAXB;
 import java.io.File;
@@ -38,11 +39,19 @@ public class OkEmail implements IOkEmail {
     private static IEngine jetEngine = null;
     private static IEngine pebbleEngine = null;
     private static IEngine freemarkEngine = null;
+
+    private static Object objectLock = new Object();
     static {
         if(isLoadXmlConfig){
             EmailInnerConfigureData ec = init();
-            if(ec != null) {
-                MailConfigureFactory.register(ec);
+            if(ec != null&& StringUtils.isNotEmpty(ec.getPassword())) {
+                if(!MailConfigureFactory.exist(ec.getUserName())){
+                    synchronized (objectLock){
+                        if(!MailConfigureFactory.exist(ec.getUserName())){
+                            MailConfigureFactory.register(ec);
+                        }
+                    }
+                }
             }
         }
 
@@ -170,9 +179,12 @@ public class OkEmail implements IOkEmail {
         String pw = getPassword(password, isEncrypt, pwPBESalt);
 
         if(!MailConfigureFactory.exist(username)){
-            EmailInnerConfigureData ec = defaultConfig(mailType, username, pw, debug);
-
-            MailConfigureFactory.register(ec);
+            synchronized (objectLock){
+                if(!MailConfigureFactory.exist(username)){
+                    EmailInnerConfigureData ec = defaultConfig(mailType, username, pw, debug);
+                    MailConfigureFactory.register(ec);
+                }
+            }
         }
     }
 
@@ -188,9 +200,12 @@ public class OkEmail implements IOkEmail {
     private static String getPassword(String password, boolean decrypt, String pwPBESalt) {
         if (decrypt) {
             // 密码解密
-            if(StringUtils.isNotEmpty(pwPBESalt)){ // 二次加密
+            if(StringUtils.isNotEmpty(pwPBESalt)){
+                // PBECoder.decryptHex 加解密模式
                 return EncryptedEmailPasswordCallback.decrypt(password, pwPBESalt);
             }
+
+            // TripleDesEncryptUtil.tripleDesDecrypt 加解密
             return EncryptedEmailPasswordCallback.decrypt(password);
         }else{
             return password;
@@ -226,6 +241,11 @@ public class OkEmail implements IOkEmail {
     public boolean send() {
         ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
         Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
+
+        if(!driversIterator.hasNext()){
+            return false;
+        }
+
         //加载并初始化实现
         IEmailServer emailServer = driversIterator.next();
 
@@ -247,8 +267,24 @@ public class OkEmail implements IOkEmail {
         ServiceLoader<IEmailServer> loadedDrivers = ServiceLoader.load(IEmailServer.class);
         Iterator<IEmailServer> driversIterator = loadedDrivers.iterator();
 
+        if(!driversIterator.hasNext()){
+            ThreadEmailEntry entry = new ThreadEmailEntry();
+            entry.release();
+            entry.setErrorMessage("无发送服务的spi实现");
+
+            return new AsyncResult<>(entry);
+        }
+
         //加载并初始化实现
         IEmailServer emailServer = driversIterator.next();
+        if(emailServer == null){
+
+            ThreadEmailEntry entry = new ThreadEmailEntry();
+            entry.release();
+            entry.setErrorMessage("无发送服务的spi实现");
+
+            return new AsyncResult<>(entry);
+        }
 
         Future<ThreadEmailEntry> future = emailServer.send(emailMessage);
         log.debug("邮件已发送, future:{}!", future);

@@ -38,6 +38,13 @@ public class ThreadEmailEntry {
 	private Throwable throwable;
 
 	/**
+	 * 异常信息
+	 */
+	@Getter
+	@Setter
+	private String errorMessage;
+
+	/**
 	 * 创建一个新的entry。
 	 */
 	public ThreadEmailEntry() {

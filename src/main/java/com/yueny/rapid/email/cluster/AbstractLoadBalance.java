@@ -42,7 +42,7 @@ public abstract class AbstractLoadBalance implements LoadEmailBalance {
         }
 
         if(config.isDebug()){
-            log.debug("选取预发送邮件的邮箱服务:{}", config);
+            log.debug("选取预发送邮件的邮箱服务[0]:{}", config);
         }
 
         return config;

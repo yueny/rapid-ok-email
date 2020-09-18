@@ -31,6 +31,8 @@ import java.util.concurrent.Future;
 /**
  * 基于 JavaMailSender 的邮件发送服务
  *
+ * 多种实现方式，二选一
+ *
  * @author yueny09 <yueny09@163.com>
  *
  * @DATE 2017年12月15日 下午3:54:16
@@ -56,6 +58,7 @@ public class JavaxMailServer extends BaseEmailServer {
                     entry.release();
                 } catch (final Exception e) {
                     entry.setThrowable(e);
+                    entry.setErrorMessage(e.getMessage());
                 }
 
                 return entry;

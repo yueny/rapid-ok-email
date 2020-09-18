@@ -32,9 +32,12 @@ public class OkEmailTest {
 
     @Before
     public void before() {
-        OkEmail.config(MailSmtpType._126, "deep_blue_yang@126.com",
-                "a668cbc1e9f66ff061f6fde864dfa7fc6d2dcad1a19d372733bf6e631a39c6c368368957381ca0fe",
-                true, "e3194b6b10a8e5a0");
+//        OkEmail.config(MailSmtpType._ALIYUN, "report@muzinuo.com",
+//                "A235F75C1BD5F1EDFCD6F51C7119D14D3A6A342FB93FF2272456E11F41E6BE71",
+//                true);
+//        OkEmail.config(MailSmtpType._ALIYUN, "report@muzinuo.com",
+//                "ccd16297df5b39c5e3b54d30fa35e14648b17795b743ac44259ac83a479b0b24fa0404ebdb0baf6466e658859d25fed1c1787b58693c3a64917cb85a43e2f2fce0525a6738956de6",
+//                true, "3e0deb39e46b3c75");
     }
 
     @Test

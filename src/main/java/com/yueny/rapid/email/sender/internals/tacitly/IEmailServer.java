@@ -12,6 +12,7 @@ import com.yueny.rapid.email.util.MailMethodType;
 import java.util.concurrent.Future;
 
 /**
+ * 通过 com.yueny.rapid.email.sender.internals.tacitly.IEmailServer 文件注入
  * @author yueny09 <yueny09@163.com>
  *
  * @DATE 2018年4月10日 下午6:56:19

@@ -31,6 +31,8 @@ import java.util.concurrent.Future;
 /**
  * 基于 JavaMailSender 的邮件发送服务
  *
+ * 多种实现方式，二选一
+ *
  * @author yueny09 <yueny09@163.com>
  *
  * @DATE 2017年12月15日 下午3:54:16
@@ -180,6 +182,7 @@ public class JavaMailSenderServer extends BaseEmailServer {
 						entry.release();
 					} catch (final Exception e) {
 						entry.setThrowable(e);
+						entry.setErrorMessage(e.getMessage());
 					}
 
 					return entry;
@@ -203,7 +206,7 @@ public class JavaMailSenderServer extends BaseEmailServer {
 		EmailInnerConfigureData data = new RandomLoadBalance().select(MailConfigureFactory.getAll());
 		// 如果未配置, 则直接抛出异常
 		if(data == null){
-			throw new SendMailException("邮箱基本配置异常, 请确认配置信息:"+ data);
+			throw new SendMailException("邮箱基本配置异常, 请确认 MailConfigureFactory 配置信息:"+ data);
 		}
 
 		if(data.isDebug()){

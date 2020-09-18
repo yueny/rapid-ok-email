@@ -55,7 +55,7 @@ OkEmail.config(MailSmtpType._126, "aaaa@126.com",
 * auth: 认证用户信息。 必配项
     + decrypt: 设置密码是否加密，默认不加密
     + user-name: 认证用户名
-    + password: 认证用户密码
+    + password: 认证用户密码。 如果密码为密文，则需要配置 decrypt 和 pw-ps
     + pw-ps: password 字段额外加密，默认空。
              该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作. 值为 PBE加密的盐
 
@@ -63,6 +63,10 @@ OkEmail.config(MailSmtpType._126, "aaaa@126.com",
     + print-duration-timer: 控制台打印邮件发送耗时。 日志级别info。默认不打印
     + debug： 是否开启调试模式。 默认否
 
+#### 密码加密说明
+* 不加密时，密码为明文。
+* 加密时，  isEncrypt为true， 无pw-ps value时， 加解密模式为  TripleDesEncryptUtil.tripleDesDecrypt
+* 加密时，  isEncrypt为true， 有pw-ps value时， 盐值为 pw-ps value，加解密模式为  PBECoder.decryptHex 
 
 
 #### 使用API

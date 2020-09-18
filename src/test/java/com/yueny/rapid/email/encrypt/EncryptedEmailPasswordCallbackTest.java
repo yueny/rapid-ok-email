@@ -29,7 +29,7 @@ public class EncryptedEmailPasswordCallbackTest {
 
 	@Test
 	public void test1() {
-		final String passwd = "aaaaa";
+		final String passwd = "aa";
 		String pwPBESalt = EncryptedEmailPasswordCallback.getSalt();
 //		String pwPBESalt = "aaa";
 		System.out.println("加密前的数据:" + passwd + ", 盐：" + pwPBESalt);
