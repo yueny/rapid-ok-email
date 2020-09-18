@@ -43,14 +43,12 @@ public class XMLEmailAuthentication {
 	private Boolean decrypt = false;
 
 	/**
-	 * password 字段额外加密，默认空。
-	 * 该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作
-	 * 值为 PBE加密的盐
+	 * 认证用户名
 	 */
-	@XmlAttribute(name = "pw-ps")
+	@XmlElement(name = "user-name")
 	@Getter
 	@Setter
-	private String pwPBESalt;
+	private String userName;
 
 	/**
 	 * 认证用户密码
@@ -59,12 +57,15 @@ public class XMLEmailAuthentication {
 	@Getter
 	@Setter
 	private String password;
+
 	/**
-	 * 认证用户名
+	 * password 字段额外加密，默认空。
+	 * 该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作
+	 * 值为 PBE加密的盐
 	 */
-	@XmlElement(name = "user-name")
+	@XmlAttribute(name = "pw-ps")
 	@Getter
 	@Setter
-	private String userName;
+	private String pwPBESalt;
 
 }

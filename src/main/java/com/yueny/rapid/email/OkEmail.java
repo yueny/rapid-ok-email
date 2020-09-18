@@ -67,17 +67,25 @@ public class OkEmail implements IOkEmail {
             EmailInnerConfigureData.EmailInnerConfigureDataBuilder builder = EmailInnerConfigureData.builder()
                     .transportProtocol(emailDefaultConfiguration.getTransportProtocol())
                     .alias(emailDefaultConfiguration.getAlias())
-                    .smtpType(smtpType)
-                    .userName(emailDefaultConfiguration.getAuth().getUserName())
-                    .decrypt(emailDefaultConfiguration.getAuth().getDecrypt())
-                    .pwPBESalt(emailDefaultConfiguration.getAuth().getPwPBESalt())
                     .smtpPort(emailDefaultConfiguration.getSmtpPort())
                     .ssl(emailDefaultConfiguration.getSsl())
-                    .sslPort(emailDefaultConfiguration.getSslPort());
+                    .sslPort(emailDefaultConfiguration.getSslPort())
+                    .smtpType(smtpType)
 
-            builder.password(getPassword(emailDefaultConfiguration.getAuth().getPassword(),
-                    emailDefaultConfiguration.getAuth().getDecrypt(),
-                    emailDefaultConfiguration.getAuth().getPwPBESalt()));
+                    .userName(emailDefaultConfiguration.getAuth().getUserName())
+                    // password 后续单独处理
+
+                    .printDurationTimer(emailDefaultConfiguration.getConfig().getPrintDurationTimer())
+                    .debug(emailDefaultConfiguration.getConfig().getDebug())
+                    ;
+
+            try {
+                builder.password(getPassword(emailDefaultConfiguration.getAuth().getPassword(),
+                        emailDefaultConfiguration.getAuth().getDecrypt(),
+                        emailDefaultConfiguration.getAuth().getPwPBESalt()));
+            } catch (Exception e){
+                    log.error("密码设置异常：", e);
+            }
 
             // config
             if (emailDefaultConfiguration.getConfig() != null) {
@@ -170,14 +178,10 @@ public class OkEmail implements IOkEmail {
 
     private static EmailInnerConfigureData defaultConfig(MailSmtpType smtpType, String userName, String password, Boolean debug) {
         return EmailInnerConfigureData.builder()
-                .smtpType(smtpType)
-                .userName(userName)
-                .password(password)
-                .smtpPort(smtpType.getSmtpSSLPort())
-                .sslPort(smtpType.getSmtpSSLPort())
-                .ssl(true)
-                .printDurationTimer(false)
-                .debug(false)
+                .alias(userName).smtpPort(smtpType.getSmtpSSLPort())
+                .ssl(true).sslPort(smtpType.getSmtpSSLPort()).smtpType(smtpType)
+                .userName(userName).password(password)
+                .printDurationTimer(false).debug(false)
                 .build();
     }
 

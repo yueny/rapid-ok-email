@@ -41,7 +41,7 @@ public class XMLEmailConfig {
 	private Boolean printDurationTimer = false;
 
 	/**
-	 * 是否开启调试模式<br>
+	 * 是否开启调试模式。 默认否<br>
 	 */
 	@XmlElement(name = "debug", required = false)
 	@Getter

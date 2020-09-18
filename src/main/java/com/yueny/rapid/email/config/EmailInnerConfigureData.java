@@ -25,33 +25,24 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	 */
 	private String alias;
 
-	/**
-	 * 设置密码是否加密，默认不加密
-	 */
-	private boolean decrypt = false;
-	/**
-	 * password 字段额外加密，默认空。
-	 * 该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作
-	 * 值为 PBE加密的盐
-	 */
-	private String pwPBESalt;
+	// 此处明文，不再关心加密方式
+//	/**
+//	 * 设置密码是否加密，默认不加密
+//	 */
+//	private boolean decrypt = false;
+//	/**
+//	 * password 字段额外加密，默认空。
+//	 * 该配置仅当 decrypt=true 有效。此处会调用rapid-lang-crypt的PBECoder动作
+//	 * 值为 PBE加密的盐
+//	 */
+//	private String pwPBESalt;
 
-//	/**
-//	 * 发件地址
-//	 */
-//	private String from;
-//	/**
-//	 * 设置SMTP服务器名称
-//	 */
-//	private String hostName;
 	/**
 	 * MailSmtpType， 取值范围来自 MailSmtpType(_126,_163,_ALIYUN,_QQ,_QQ_ENT)
+	 *
+	 * SMTP服务器名称 hostName 来自  MailSmtpType
 	 */
 	private MailSmtpType smtpType;
-	/**
-	 * 是否同步发送
-	 */
-	private boolean isAsynSend = true;
 	/**
 	 * 认证用户密码, 此处已解密, 为明文
 	 */
@@ -88,5 +79,10 @@ public class EmailInnerConfigureData extends AbstractMaskBo {
 	 * transport.protocol
 	 */
 	private String transportProtocol = EmailConstant.DEFAULT_TRANSPORT_PROTOCOL;
+
+	/**
+	 * 是否同步发送
+	 */
+	private boolean isAsynSend = true;
 
 }

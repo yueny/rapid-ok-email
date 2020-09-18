@@ -50,51 +50,42 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 public class XMLEmailConfiguration {
 	/**
-	 * transport.protocol
+	 * transport.protocol。 选配。
 	 */
 	@XmlElement(name = "transport-protocol", required = false)
 	private String transportProtocol = EmailConstant.DEFAULT_TRANSPORT_PROTOCOL;
 
 	/**
-	 * 设置缺省的FROM地址别名
+	 * 设置缺省的FROM地址别名。 必配项
 	 */
 	@XmlElement(name = "alias")
 	private String alias;
-//
-//	/**
-//	 * 设置缺省的FROM地址
-//	 */
-//	@XmlElement(name = "from")
-//	private String from;
-
-//	/**
-//	 * 设置SMTP服务器名称
-//	 */
-//	@XmlElement(name = "host-name", required = true)
-//	private String hostName;
 
 	/**
-	 * 设置SMTP端口
+	 * 设置SMTP端口。 选配。
+	 *
 	 * "mail.smtp.port"
 	 */
 	@XmlElement(name = "smtp-port")
 	private String smtpPort = "465";
 
 	/**
-	 * 设置是否使用SSL，默认false.
+	 * 设置是否使用SSL，默认 true.
 	 * "mail.smtp.ssl.enable"
 	 */
 	@XmlElement(name = "ssl")
-	private Boolean ssl = true;
+	private Boolean ssl = EmailConstant.DEFAULT_SMTP_AUTH;
 
 	/**
 	 * 设置SSL端口
-	@XmlElement(name = "ssl-port")
 	 */
+	@XmlElement(name = "ssl-port")
 	private String sslPort = "465";
 
 	/**
 	 * MailSmtpType， 取值范围来自 MailSmtpType(_126,_163,_ALIYUN,_QQ,_QQ_ENT)
+	 *
+	 * SMTP服务器名称 hostName 来自  MailSmtpType
 	 */
 	@XmlElement(name = "smtp-type", required = true)
 	private String smtpType;

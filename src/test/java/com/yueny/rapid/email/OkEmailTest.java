@@ -32,9 +32,9 @@ public class OkEmailTest {
 
     @Before
     public void before() {
-//        OkEmail.config(MailSmtpType._126, "deep_blue_yang@126.com",
-//                "a668cbc1e9f66ff061f6fde864dfa7fc6d2dcad1a19d372733bf6e631a39c6c368368957381ca0fe",
-//                true, "e3194b6b10a8e5a0");
+        OkEmail.config(MailSmtpType._126, "deep_blue_yang@126.com",
+                "a668cbc1e9f66ff061f6fde864dfa7fc6d2dcad1a19d372733bf6e631a39c6c368368957381ca0fe",
+                true, "e3194b6b10a8e5a0");
     }
 
     @Test

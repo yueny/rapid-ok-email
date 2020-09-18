@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="gb2312"?>
 <email>
+	<transport-protocol>smtp</transport-protocol>
+	<smtp-port>465</smtp-port>
+	<ssl>true</ssl>
+	<ssl-port>true</ssl-port>
+
     <!-- 设置缺省的FROM地址别名-->
 	<alias>deep_blue_yang@</alias>
 
 	<!-- 设置SMTP服务器名称 -->
 	<smtp-type>_ALIYUN</smtp-type>
 
-	<!-- 认证用户 -->
-	<auth decrypt="true" pw-ps="3e0deb39e46b3c75">
+	<!-- 认证用户. pw-ps 为 pwPBESalt -->
+	<auth decrypt="true" pw-ps="3e0ssdeb39e46b3c75">
 		<!-- 认证用户名 -->
 		<user-name>report@muzinuo.com</user-name>
 		<!-- 认证用户密码  -->
