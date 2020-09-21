@@ -10,7 +10,7 @@
    	<version>xxxx</version>
 </dependency>
 ```
-最新版本 ：1.1.0-SNAPSHOT
+最新版本 ：1.1.0
 
 ### 配置
 #### 方式一、javaconfig
