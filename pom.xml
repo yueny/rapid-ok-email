@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>com.yueny</groupId>
 		<artifactId>yueny-parent</artifactId>
-		<version>1.1.6-RELEASE</version>
+		<version>1.2.0-RELEASE</version>
 	</parent>
 	
 	<groupId>com.yueny.rapid.message</groupId>
 	<artifactId>rapid-ok-email</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 
@@ -21,6 +21,34 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-util-web-freemarker</artifactId>
+			<version>1.0.1-RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-util</artifactId>
+			<version>1.0.1-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-crypt</artifactId>
+			<version>1.0.1-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-mask</artifactId>
+			<version>1.0.1-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yueny.rapid</groupId>
+			<artifactId>rapid-lang-thread</artifactId>
+			<version>1.0.1-RELEASE</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -56,32 +84,6 @@
 			<artifactId>jetbrick-template</artifactId>
 			<version>2.1.2</version>
 			<!--<scope>provided</scope>-->
-		</dependency>
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-util-web-freemarker</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-lang-util</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-lang-crypt</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-lang-mask</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-lang-thread</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

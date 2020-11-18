@@ -96,3 +96,6 @@ Future<ThreadEmailEntry> future = OkEmail
 
 ##### 1.1.0-SNAPSHOT/1.1.0
 * 补充邮件发送的非必填参数的配置化
+
+##### 1.1.1
+*  依赖改为 release
