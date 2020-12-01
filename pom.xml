@@ -11,16 +11,26 @@
 	
 	<groupId>com.yueny.rapid.message</groupId>
 	<artifactId>rapid-ok-email</artifactId>
-	<version>1.1.1</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
+	<url>https://github.com/yueny/rapid-ok-email</url>
+	<description>${project.artifactId}</description>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<com.whosly.rapid.mask.version>4.1.0-SNAPSHOT</com.whosly.rapid.mask.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.whosly</groupId>
+			<artifactId>rapid-lang-mask</artifactId>
+			<version>${com.whosly.rapid.mask.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.yueny.rapid</groupId>
 			<artifactId>rapid-util-web-freemarker</artifactId>
@@ -37,11 +47,7 @@
 			<artifactId>rapid-lang-crypt</artifactId>
 			<version>1.0.1-RELEASE</version>
 		</dependency>
-		<dependency>
-			<groupId>com.yueny.rapid</groupId>
-			<artifactId>rapid-lang-mask</artifactId>
-			<version>1.0.1-RELEASE</version>
-		</dependency>
+
 		<dependency>
 			<groupId>com.yueny.rapid</groupId>
 			<artifactId>rapid-lang-thread</artifactId>
@@ -52,7 +58,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.18</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -115,18 +120,18 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-deploy-plugin</artifactId>-->
+<!--			</plugin>-->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-compiler-plugin</artifactId>-->
+<!--			</plugin>-->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-eclipse-plugin</artifactId>-->
+<!--			</plugin>-->
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -142,41 +147,35 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<profiles>
-	 	<profile>
-	 		<id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <env>dev</env>
-            </properties>
-            <build>
-            	<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-					</plugin>
-                </plugins>  
-            </build>
-	 	</profile>
-	 	
-		<profile>
-			<id>prod</id>
-			<properties>
-				<env>prod</env>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
-	
+	<licenses>
+		<!-- Apache许可证 -->
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<!-- SCM信息 -->
+	<scm>
+		<url>https://github.com/yueny/rapid-ok-email</url>
+		<connection>scm:https://github.com/yueny/rapid-ok-email.git</connection>
+		<developerConnection>scm:https://github.com/yueny/rapid-ok-email.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<!-- 开发者信息 -->
+	<developers>
+		<developer>
+			<name>fengyang</name>
+			<email>deep_blue_yang@126.com</email>
+			<url>https://github.com/yueny</url>
+			<roles>
+				<role>software engineer</role>
+			</roles>
+			<timezone>9</timezone>
+		</developer>
+	</developers>
+
 </project>
